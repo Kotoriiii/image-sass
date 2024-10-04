@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
 import Uppy from "@uppy/core";
 import { useState } from "react";
@@ -24,14 +26,18 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
   const file = files[index];
   const percentage = file?.progress?.percentage || 0;
 
-  const clear = () => {
-    if (totalProgress !== 100) {
-      uppy.cancelAll();
-    }
+  const clearFileList = () => {
     files.map((file) => {
       uppy.removeFile(file.id);
     });
     setIndex(0);
+  };
+
+  const clear = () => {
+    if (totalProgress !== 100) {
+      uppy.cancelAll();
+    }
+    clearFileList();
   };
 
   return file ? (
@@ -97,9 +103,14 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
           </Button>
           <Button
             onClick={() => {
-              uppy.upload().then(() => {
-                clear();
-              });
+              uppy
+                .upload()
+                .then(() => {
+                  clearFileList();
+                })
+                .catch(() => {
+                  clearFileList();
+                });
             }}
           >
             Upload All

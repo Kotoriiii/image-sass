@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
+import { toast } from "sonner";
 import { useEffect, useRef, useState } from "react";
 import Uppy, {
   GenericEventCallback,
   UploadCallback,
   UploadSuccessCallback,
+  ErrorCallback,
 } from "@uppy/core";
 import { useUppyState } from "@/dashboard/useUppyState";
 import { trpcClientReact, trpcPureClient, AppRouter } from "@/utils/api";
@@ -101,15 +103,24 @@ export function FileList({
 
     const cancelProgressHandler: GenericEventCallback = () => {
       setUploadingFileIDs([]);
+      toast.error("cancel the upload");
+    };
+
+    const errorHanlder: ErrorCallback = () => {
+      setUploadingFileIDs([]);
+      toast.error("cannot upload file");
     };
 
     const completeHandler = () => {
       setUploadingFileIDs([]);
+      toast.success("upload file success");
     };
 
     uppy.on("upload", uploadProgressHandler);
 
     uppy.on("cancel-all", cancelProgressHandler);
+
+    uppy.on("error", errorHanlder);
 
     uppy.on("upload-success", handler);
 
@@ -117,6 +128,8 @@ export function FileList({
 
     return () => {
       uppy.off("upload-success", handler);
+      uppy.off("cancel-all", cancelProgressHandler);
+      uppy.off("error", errorHanlder);
       uppy.off("upload", uploadProgressHandler);
       uppy.off("complete", completeHandler);
     };

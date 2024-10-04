@@ -25,26 +25,29 @@ export default function DashboardAppList() {
   }, [apps, router]);
 
   return (
-    <div className=" w-fit mx-auto pt-10">
+    <div className="flex justify-center items-center mx-auto pt-10">
       {isLoading ? (
         <div>Loading...</div>
       ) : (
-        <div className=" flex w-full max-w-md flex-col gap-2 rounded-md border p-2">
+        <div className=" flex justify-center items-center w-full max-w-md flex-col gap-2 rounded-md border p-6">
+          <h1 className="text-xl">App List</h1>
           {apps?.map((app) => (
             <div
               key={app.id}
-              className="flex items-center justify-between gap-6"
+              className=" flex w-full max-w-md flex-col gap-2 rounded-md border p-6"
             >
-              <div>
-                <h2 className="text-xl">{app.name}</h2>
-                <p className="text-base-content/60">
-                  {app.description ? app.description : "(no description)"}
-                </p>
-              </div>
-              <div>
-                <Button asChild variant="destructive">
-                  <Link href={`/dashboard/apps/${app.id}`}>Go</Link>
-                </Button>
+              <div className="flex items-center justify-between gap-6">
+                <div>
+                  <h2 className="text-xl">{app.name}</h2>
+                  <p className="text-base-content/60">
+                    {app.description ? app.description : "(no description)"}
+                  </p>
+                </div>
+                <div>
+                  <Button asChild>
+                    <Link href={`/dashboard/apps/${app.id}`}>Go</Link>
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

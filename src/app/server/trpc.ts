@@ -1,6 +1,5 @@
-import z from "zod";
 import { headers } from "next/headers";
-import { TRPCError, createCallerFactory, initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import { getServerSession } from "@/server/auth";
 import { db } from "./db/db";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -35,7 +34,7 @@ export const protectedProcedure = withLoggerProcedure
         code: "FORBIDDEN",
       });
     }
-    
+
     return next({
       ctx: {
         session: ctx.session!,

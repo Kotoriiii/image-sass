@@ -1,11 +1,11 @@
 import {
   GetObjectCommand,
   GetObjectCommandInput,
-  S3Client,
 } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import { db } from "@/server/db/db";
+import S3ClientSingleton from "@/server/S3ClientSingleton";
 
 export async function GET(
   request: NextRequest,
@@ -34,20 +34,18 @@ export async function GET(
     });
   }
 
-  const storage = file.app.storage.configuration;
+  const storage = file.app.storage;
 
   const params: GetObjectCommandInput = {
-    Bucket: storage.bucket,
+    Bucket: storage.configuration.bucket,
     Key: file.path,
   };
 
-  const s3Client = new S3Client({
-    endpoint: storage.apiEndpoint,
-    region: storage.region,
-    credentials: {
-      accessKeyId: storage.accessKeyId,
-      secretAccessKey: storage.secretAccessKey,
-    },
+  const s3Client = S3ClientSingleton.getInstance({
+    apiEndpoint: storage.configuration.apiEndpoint,
+    region: storage.configuration.region,
+    accessKeyId: storage.configuration.accessKeyId,
+    secretAccessKey: storage.configuration.secretAccessKey,
   });
 
   const command = new GetObjectCommand(params);
