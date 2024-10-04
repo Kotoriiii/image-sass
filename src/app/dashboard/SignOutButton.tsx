@@ -10,7 +10,7 @@ export default function SignOutButton() {
         signOut({
           callbackUrl:
             process.env.NODE_ENV === "production"
-              ? `${process.env.BASE_PATH}/auth/signin`
+              ? `${process.env.NEXT_PUBLIC_BASE_PATH}/auth/signin`
               : "/auth/signin",
         })
       }

@@ -97,7 +97,7 @@ export default function Signin() {
             signIn("gitlab", {
               callbackUrl:
                 process.env.NODE_ENV === "production"
-                  ? `${process.env.BASE_PATH}/dashboard`
+                  ? `${process.env.NEXT_PUBLIC_BASE_PATH}/dashboard`
                   : "/dashboard",
             })
           }
@@ -112,8 +112,8 @@ export default function Signin() {
             signIn("github", {
               callbackUrl:
                 process.env.NODE_ENV === "production"
-                  ? `${process.env.BASE_PATH}/dashboard`
-                  : "/dashboard",
+                  ? `${process.env.NEXT_PUBLIC_BASE_PATH}/dashboard`
+                  : "/images-sass/dashboard",
             })
           }
         >

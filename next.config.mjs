@@ -2,7 +2,9 @@
 
 const nextConfig = {
   basePath:
-    process.env.NODE_ENV === "production" ? `${process.env.BASE_PATH}` : "",
+    process.env.NODE_ENV === "production"
+      ? `${process.env.NEXT_PUBLIC_BASE_PATH}`
+      : "",
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   },
