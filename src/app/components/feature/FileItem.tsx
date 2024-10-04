@@ -12,7 +12,7 @@ export function FileItem({
   isImage: boolean;
 }) {
   return isImage ? (
-    <img src={url} alt={name} className="w-[100%] h-[100%] object-contain"/>
+    <img src={url} alt={name} className="w-[100%] h-[100%] object-contain" />
   ) : (
     <Image
       src="/unknown-file-types.png"
@@ -46,5 +46,11 @@ export function RemoteFileItem({
 }) {
   const isImage = contentType.startsWith("image");
 
-  return <FileItem isImage={isImage} url={`/image/${id}`} name={name}></FileItem>;
+  return (
+    <FileItem
+      isImage={isImage}
+      url={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/image/${id}`}
+      name={name}
+    ></FileItem>
+  );
 }

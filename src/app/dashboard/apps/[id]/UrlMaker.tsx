@@ -12,7 +12,9 @@ export function UrlMaker({ id }: { id: string }) {
   const [rotate, setRotate] = useState(0);
 
   const [url, setUrl] = useState(
-    `/image/${id}?width=${width}&rotate=${rotate}`
+    `${
+      process.env.NEXT_PUBLIC_BASE_PATH || ""
+    }/image/${id}?width=${width}&rotate=${rotate}`
   );
 
   return (
@@ -44,7 +46,13 @@ export function UrlMaker({ id }: { id: string }) {
           />
         </div>
         <Button
-          onClick={() => setUrl(`/image/${id}?width=${width}&rotate=${rotate}`)}
+          onClick={() =>
+            setUrl(
+              `${
+                process.env.NEXT_PUBLIC_BASE_PATH || ""
+              }/image/${id}?width=${width}&rotate=${rotate}`
+            )
+          }
         >
           Make
         </Button>
