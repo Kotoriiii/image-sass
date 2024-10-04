@@ -113,7 +113,7 @@ export default function Signin() {
               callbackUrl:
                 process.env.NODE_ENV === "production"
                   ? `${process.env.NEXT_PUBLIC_BASE_PATH}/dashboard`
-                  : "/images-sass/dashboard",
+                  : "/dashboard",
             })
           }
         >
