@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4000",
     "lint": "next lint",
     "push:dev": "NODE_ENV=development drizzle-kit push",
-    "push:prod": "NODE_ENV=production drizzle-kit push"
+    "push:prod": "NODE_ENV=production drizzle-kit push",
+    "prod":"pm2 start pnpm --name image-sass -- start"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
@@ -68,6 +69,7 @@
     "dotenv": "^16.4.5",
     "eslint": "^8",
     "eslint-config-next": "14.2.6",
+    "pm2": "^5.4.2",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
