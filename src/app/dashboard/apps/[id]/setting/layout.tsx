@@ -11,7 +11,7 @@ export default function SettingLayout({ children }: { children: ReactNode }) {
   const id = params.id as string;
 
   return (
-    <div className="flex justify-start container mx-auto pl-8 pr-8 ml-auto mr-auto">
+    <div className="flex justify-start container mx-auto">
       <div className="flex flex-col w-60 flex-shrink-0 pt-10 gap-4">
         <Button
           size="lg"

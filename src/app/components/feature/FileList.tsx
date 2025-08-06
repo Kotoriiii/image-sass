@@ -193,7 +193,7 @@ export function FileList({
   return (
     <ScrollArea className="h-full @container">
       {isPending && <div className="text-center">Loading</div>}
-      <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 gap-4 relative container pl-8 pr-8 ml-auto mr-auto">
+      <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 gap-4 relative container">
         {uploadingFileIDs.length > 0 &&
           uploadingFileIDs.map(id => {
             const file = uppyFiles[id];

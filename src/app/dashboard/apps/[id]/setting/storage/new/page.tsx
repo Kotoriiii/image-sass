@@ -29,7 +29,7 @@ export default function CreateNewStorageAPI() {
   };
 
   return (
-    <div className="container pt-10 pl-8 pr-8 ml-auto mr-auto">
+    <div className="container pt-10">
       <h1 className="text-3xl mb-6 max-w-md mx-auto">Create Storage</h1>
       <form
         className="flex flex-col gap-4 max-w-md mx-auto"

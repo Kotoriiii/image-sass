@@ -27,7 +27,7 @@ export default async function DashboardLayout({
     <ThemeProvider>
       <div className="h-screen">
         <nav className="h-[80px] border-b relative">
-          <div className="container flex gap-2 justify-end items-center h-full pl-8 pr-8 ml-auto mr-auto">
+          <div className="container flex gap-2 justify-end items-center h-full">
             <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger>

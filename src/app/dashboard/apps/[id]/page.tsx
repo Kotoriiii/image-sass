@@ -172,7 +172,7 @@ export default function AppPage({
   } else {
     children = (
       <div className="mx-auto h-full">
-        <div className="container flex justify-between items-center h-[60px] pl-8 pr-8 ml-auto mr-auto">
+        <div className="container flex justify-between items-center h-[60px]">
           <Button
             onClick={() => {
               setOrderBy(current => ({
