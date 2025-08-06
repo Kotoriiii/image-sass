@@ -11,7 +11,13 @@ export function FileItem({
   isImage: boolean;
 }) {
   return isImage ? (
-    <Image src={url} alt={name} className="w-[100%] h-[100%] object-contain" />
+    <Image
+      src={url}
+      alt={name}
+      className="w-[100%] h-[100%] object-contain"
+      width={100}
+      height={100}
+    />
   ) : (
     <Image
       src="/unknown-file-types.png"
