@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { use } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
@@ -10,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
 import { trpcClientReact } from "@/utils/api";
-import Image from "next/image";
 
 export default function AppDashboardNav({
   params,
@@ -24,7 +24,7 @@ export default function AppDashboardNav({
 
   return (
     <div className="flex items-center gap-3">
-      <Image src="/brand-logo.svg" alt="Image SaaS" width={120} height={32} />
+      <Image src="/brand-logo.svg" alt="Image SaaS" width={32} height={32} />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost">

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ReactNode, useState, use } from "react";
 import Link from "next/link";
 import { Uppy } from "@uppy/core";
@@ -16,7 +17,6 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
 import { type FilesOrderByColumn } from "@/server/routes/file";
 import { UrlMaker } from "./UrlMaker";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import Image from "next/image";
 
 export default function AppPage({
   params,
@@ -152,14 +152,14 @@ export default function AppPage({
     children = (
       <div className="flex flex-col items-center justify-center h-64 gap-4">
         <Image src="/loading-icon.svg" alt="Loading" width={40} height={40} />
-        <p className="text-gray-600">loading...</p>
+        <p className="text-gray-600">Loading...</p>
       </div>
     );
   } else if (!currentApp) {
     children = (
       <div className="flex flex-col mt-10 p-4 border rounded-md max-w-48 mx-auto items-center">
         <p className="text-lg">App Not Exist</p>
-        <p className="text-sm">Chose another one</p>
+        <p className="text-sm">Choose another one</p>
         <div className="flex flex-col gap-4 items-center">
           {apps?.map(app => (
             <Button key={app.id} asChild variant="link">
@@ -208,8 +208,8 @@ export default function AppPage({
                       width={48}
                       height={48}
                     />
-                    <p className="text-2xl font-semibold text-blue-600">
-                      拖拽文件到此处上传
+                    <p className="text-2xl font-semibold text-black">
+                      Drag files here to upload
                     </p>
                   </div>
                 )}

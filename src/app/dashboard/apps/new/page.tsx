@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { getServerSession } from "@/server/auth";
@@ -5,7 +6,6 @@ import { createAppSchema } from "@/server/db/validate-schema";
 import { serverCaller } from "@/utils/trpc";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "./SubmitButton";
-import Image from "next/image";
 
 export default async function CreateApp() {
   async function createApp(formData: FormData) {
