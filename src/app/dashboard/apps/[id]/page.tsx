@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
 import { type FilesOrderByColumn } from "@/server/routes/file";
 import { UrlMaker } from "./UrlMaker";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import Image from "next/image";
 
 export default function AppPage({
   params,
@@ -148,7 +149,12 @@ export default function AppPage({
   let children: ReactNode;
 
   if (isPending) {
-    children = <div>Loading...</div>;
+    children = (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <Image src="/loading-icon.svg" alt="Loading" width={40} height={40} />
+        <p className="text-gray-600">loading...</p>
+      </div>
+    );
   } else if (!currentApp) {
     children = (
       <div className="flex flex-col mt-10 p-4 border rounded-md max-w-48 mx-auto items-center">
@@ -195,8 +201,16 @@ export default function AppPage({
             return (
               <>
                 {draging && (
-                  <div className=" absolute inset-0 bg-secondary/50 z-10 flex justify-center items-center text-3xl">
-                    Drop File Here to Upload
+                  <div className=" absolute inset-0 bg-secondary/50 z-10 flex flex-col justify-center items-center gap-4">
+                    <Image
+                      src="/upload-icon.svg"
+                      alt="Upload"
+                      width={48}
+                      height={48}
+                    />
+                    <p className="text-2xl font-semibold text-blue-600">
+                      拖拽文件到此处上传
+                    </p>
                   </div>
                 )}
                 <FileList

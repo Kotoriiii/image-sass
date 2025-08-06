@@ -5,6 +5,7 @@ import { createAppSchema } from "@/server/db/validate-schema";
 import { serverCaller } from "@/utils/trpc";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "./SubmitButton";
+import Image from "next/image";
 
 export default async function CreateApp() {
   async function createApp(formData: FormData) {
@@ -32,8 +33,14 @@ export default async function CreateApp() {
 
   return (
     <div className="h-full flex justify-center items-center">
-      <form className="w-full max-w-xl flex flex-col gap-4" action={createApp}>
-        <h1 className="text-center text-2xl font-bold">Create App</h1>
+      <form
+        className="w-full max-w-xl flex flex-col gap-4 p-6 border rounded-lg shadow-sm"
+        action={createApp}
+      >
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <Image src="/logo.svg" alt="Image SaaS" width={32} height={32} />
+          <h1 className="text-center text-2xl font-bold">Create App</h1>
+        </div>
         <Input
           name="name"
           placeholder="App Name"

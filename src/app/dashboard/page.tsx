@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { trpcClientReact } from "@/utils/api";
 import { Button } from "@/components/ui/Button";
+import Image from "next/image";
 
 export default function DashboardAppList() {
   const getAppsResult = trpcClientReact.apps.listApps.useQuery(void 0, {
@@ -27,10 +28,16 @@ export default function DashboardAppList() {
   return (
     <div className="flex justify-center items-center mx-auto pt-10">
       {isLoading ? (
-        <div>Loading...</div>
+        <div className="flex flex-col items-center gap-4">
+          <Image src="/loading-icon.svg" alt="Loading" width={40} height={40} />
+          <p className="text-gray-600">加载中...</p>
+        </div>
       ) : (
         <div className=" flex justify-center items-center w-full max-w-md flex-col gap-2 rounded-md border p-6">
-          <h1 className="text-xl">App List</h1>
+          <div className="flex items-center gap-3 mb-4">
+            <Image src="/logo.svg" alt="Image SaaS" width={32} height={32} />
+            <h1 className="text-xl font-semibold">应用列表</h1>
+          </div>
           {apps?.map(app => (
             <div
               key={app.id}

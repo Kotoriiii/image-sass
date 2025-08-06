@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
 import { trpcClientReact } from "@/utils/api";
+import Image from "next/image";
 
 export default function AppDashboardNav({
   params,
@@ -22,26 +23,29 @@ export default function AppDashboardNav({
   const currentApp = apps?.filter(app => app.id === id)[0];
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
-          {isPending ? "Loading..." : currentApp ? currentApp.name : "..."}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {apps?.map(app => {
-          return (
-            <DropdownMenuItem key={app.id} disabled={app.id === id}>
-              <Link
-                href={`/dashboard/apps/${app.id}`}
-                className="w-[100%] text-center"
-              >
-                {app.name}
-              </Link>
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-3">
+      <Image src="/brand-logo.svg" alt="Image SaaS" width={120} height={32} />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost">
+            {isPending ? "Loading..." : currentApp ? currentApp.name : "..."}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {apps?.map(app => {
+            return (
+              <DropdownMenuItem key={app.id} disabled={app.id === id}>
+                <Link
+                  href={`/dashboard/apps/${app.id}`}
+                  className="w-[100%] text-center"
+                >
+                  {app.name}
+                </Link>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
