@@ -4,5 +4,10 @@
 # Run ESLint
 pnpm lint
 
-# Run Prettier check
-pnpm format:check
+# Check formatting
+if ! pnpm format:check; then
+  echo "🔧 Auto-formatting files..."
+  pnpm format
+  git add .
+  echo "✅ Files formatted and re-staged"
+fi
