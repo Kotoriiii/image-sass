@@ -163,7 +163,6 @@ export const fileOpenRoutes = router({
               )
             : and(userFilter, deletedFilter, appFilter)
         );
-      // .orderBy(desc(files.createdAt));
 
       statement.orderBy(
         orderBy.order === "desc"
@@ -185,14 +184,12 @@ export const fileOpenRoutes = router({
       };
     }),
 
-  deleteFile: withAppProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      return db
-        .update(files)
-        .set({
-          deletedAt: new Date(),
-        })
-        .where(eq(files.id, input));
-    }),
+  deleteFile: withAppProcedure.input(z.string()).mutation(async ({ input }) => {
+    return db
+      .update(files)
+      .set({
+        deletedAt: new Date(),
+      })
+      .where(eq(files.id, input));
+  }),
 });

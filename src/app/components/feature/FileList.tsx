@@ -111,10 +111,7 @@ export function FileList({
       toast.error("cancel the upload");
     };
 
-    const errorHandler = (
-      error: { name: string; message: string; details?: string },
-      file?: UppyFile<Meta, Body>
-    ) => {
+    const errorHandler = () => {
       setUploadingFileIDs([]);
       toast.error("cannot upload file");
     };

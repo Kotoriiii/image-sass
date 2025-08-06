@@ -398,14 +398,12 @@ export const filesRoutes = router({
       };
     }),
 
-  deleteFile: protectedProcedure
-    .input(z.string())
-    .mutation(({ ctx, input }) => {
-      return db
-        .update(files)
-        .set({
-          deletedAt: new Date(),
-        })
-        .where(eq(files.id, input));
-    }),
+  deleteFile: protectedProcedure.input(z.string()).mutation(({ input }) => {
+    return db
+      .update(files)
+      .set({
+        deletedAt: new Date(),
+      })
+      .where(eq(files.id, input));
+  }),
 });

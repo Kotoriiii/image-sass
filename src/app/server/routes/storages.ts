@@ -32,7 +32,7 @@ export const storagesRouter = router({
       const result = await db
         .insert(storageConfiguration)
         .values({
-          name: input.name,
+          name,
           configuration: configuration,
           userId: ctx.session.user.id,
         })
@@ -47,7 +47,7 @@ export const storagesRouter = router({
         storageId: z.number(),
       })
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       return await db
         .update(storageConfiguration)
         .set({ deletedAt: new Date() })

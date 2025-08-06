@@ -2,13 +2,13 @@ import z from "zod";
 import { v4 as uuid } from "uuid";
 import { TRPCError } from "@trpc/server";
 import { db } from "../db/db";
-import { apiKeys, apps, storageConfiguration } from "../db/schema";
+import { apiKeys } from "../db/schema";
 import { protectedProcedure, router } from "../trpc";
 
 export const apiKeysRouter = router({
   listApiKeys: protectedProcedure
     .input(z.object({ appId: z.string() }))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       return db.query.apiKeys.findMany({
         where: (apiKeys, { eq, and, isNull }) =>
           and(eq(apiKeys.appId, input.appId), isNull(apiKeys.deletedAt)),
@@ -49,7 +49,7 @@ export const apiKeysRouter = router({
         appId: z.string(),
       })
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       const result = await db
         .insert(apiKeys)
         .values({

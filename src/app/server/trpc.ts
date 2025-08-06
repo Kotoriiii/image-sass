@@ -8,7 +8,7 @@ const t = initTRPC.context().create();
 
 const { router, procedure, createCallerFactory } = t;
 
-export const withLoggerProcedure = procedure.use(async ({ ctx, next }) => {
+export const withLoggerProcedure = procedure.use(async ({ next }) => {
   const start = Date.now();
 
   const result = await next();
@@ -18,7 +18,7 @@ export const withLoggerProcedure = procedure.use(async ({ ctx, next }) => {
   return result;
 });
 
-export const withSessionMiddleware = t.middleware(async ({ ctx, next }) => {
+export const withSessionMiddleware = t.middleware(async ({ next }) => {
   const session = await getServerSession();
 
   return next({
@@ -109,7 +109,11 @@ export const withAppProcedure = withLoggerProcedure.use(async ({ next }) => {
     try {
       jwt.verify(signedToken, apiKeyAndAppUser.key);
     } catch (err) {
-      throw new TRPCError({ code: "BAD_REQUEST" });
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "token invalid",
+        cause: err,
+      });
     }
 
     return next({

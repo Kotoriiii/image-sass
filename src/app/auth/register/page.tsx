@@ -36,7 +36,7 @@ export default function Register() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit() {
     toast("暂时未实现此功能,请用第三方登录");
   }
 
