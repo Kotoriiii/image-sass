@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/Dialog";
 import { Progress } from "@/components/ui/Progress";
-import { useUppyState } from "@/dashboard/useUppyState";
+import { useUppyState } from "@/hooks/useUppyState";
 import { LocalFileItem } from "./FileItem";
 
 export function UploadPreview({ uppy }: { uppy: Uppy }) {

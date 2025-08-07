@@ -3,7 +3,7 @@ import { inferRouterOutputs } from "@trpc/server";
 import Uppy, { Body, Meta, UppyFile } from "@uppy/core";
 import { toast } from "sonner";
 
-import { useUppyState } from "@/dashboard/useUppyState";
+import { useUppyState } from "@/hooks/useUppyState";
 import { cn } from "@/lib/utils";
 import { type FilesOrderByColumn } from "@/server/routes/file";
 import { AppRouter, trpcClientReact, trpcPureClient } from "@/utils/api";
