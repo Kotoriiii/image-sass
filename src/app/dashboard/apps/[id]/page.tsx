@@ -4,8 +4,6 @@ import { ReactNode, use, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import awsS3 from "@uppy/aws-s3";
-import { Uppy } from "@uppy/core";
 import { MoveDown, MoveUp, Settings } from "lucide-react";
 
 import { Dropzone } from "@/components/feature/Dropzone";
@@ -15,8 +13,9 @@ import { UploadPreview } from "@/components/feature/UploadPreview";
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
 import { usePasteFile } from "@/hooks/usePasteFile";
+import { useUppy } from "@/hooks/useUppy";
 import { type FilesOrderByColumn } from "@/server/routes/file";
-import { trpcClientReact, trpcPureClient } from "@/utils/api";
+import { trpcClientReact } from "@/utils/api";
 import { UrlMaker } from "./UrlMaker";
 
 export default function AppPage({ params }: { params: Promise<{ id: string }> }) {
@@ -36,99 +35,7 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
 
   const currentApp = apps?.filter((app) => app.id === appId)[0];
 
-  const [uppy] = useState(() => {
-    const uppy = new Uppy();
-    uppy.use(awsS3, {
-      limit: 6, // 并行上传的块数限制
-      shouldUseMultipart(file) {
-        // 如果文件大小超过 10MB，使用多部分上传
-        return (file.size ?? 0) > 10 * 2 ** 20;
-      },
-      async createMultipartUpload(file) {
-        const result = await trpcPureClient.file.createMultipartUpload.mutate({
-          filename: file.data instanceof File ? file.data.name : "test",
-          contentType: file.data.type || "",
-          size: file.size ?? 0,
-          appId,
-        });
-        if (!result.uploadId || !result.key) {
-          throw new Error("Failed to create multipart upload");
-        }
-        return {
-          uploadId: result.uploadId,
-          key: result.key,
-        };
-      },
-      async listParts(file, { uploadId, key }) {
-        // 返回 MaybePromise<AwsS3Part[]>
-        const result = await trpcPureClient.file.listMultipartParts.mutate({
-          uploadId: uploadId!,
-          key: key!,
-          appId,
-        });
-        return result.parts.map((part) => ({
-          PartNumber: part.PartNumber || 0,
-          ETag: part.ETag || "", // 确保 ETag 是字符串
-          Size: part.Size || 0,
-        }));
-      },
-      async signPart(file, { uploadId, key, partNumber }) {
-        // 返回 MaybePromise<{ url: string }>
-        const result = await trpcPureClient.file.signMultipartPartUrl.mutate({
-          appId,
-          uploadId,
-          key,
-          partNumber,
-        });
-        if (!result.url) {
-          throw new Error("Failed to sign part");
-        }
-        return {
-          url: result.url,
-        };
-      },
-      async completeMultipartUpload(file, { uploadId, key, parts }) {
-        // 返回 MaybePromise<{ location: string }>
-        const result = await trpcPureClient.file.completeMultipartUpload.mutate({
-          uploadId,
-          key,
-          parts,
-          appId,
-        });
-        if (!result.location) {
-          throw new Error("Failed to complete multipart upload");
-        }
-        return {
-          location: result.location,
-        };
-      },
-      async abortMultipartUpload(file, { uploadId, key }) {
-        // 返回 MaybePromise<void>
-        try {
-          await trpcPureClient.file.abortMultipartUpload.mutate({
-            uploadId: uploadId!,
-            key: key!,
-            appId,
-          });
-          console.log("Multipart upload aborted");
-        } catch (err) {
-          console.error("Failed to abort multipart upload:", err);
-        }
-      },
-
-      async getUploadParameters(file) {
-        const result = await trpcPureClient.file.createPresignedUrl.mutate({
-          filename: file.data instanceof File ? file.data.name : "test",
-          contentType: file.data.type || "",
-          size: file.size ?? 0,
-          appId: appId,
-        });
-        return result;
-      },
-    });
-
-    return uppy;
-  });
+  const uppy = useUppy(appId);
 
   usePasteFile({
     onFilesPaste: (files) => {

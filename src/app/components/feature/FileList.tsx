@@ -100,9 +100,11 @@ export function FileList({
       toast.error("cancel the upload");
     };
 
-    const errorHandler = () => {
+    const errorHandler = (error: { name: string; message: string; details?: string }) => {
       setUploadingFileIDs([]);
-      toast.error("cannot upload file");
+      // 显示具体的错误信息，如果有的话
+      const errorMessage = error?.message || "cannot upload file";
+      toast.error(errorMessage);
     };
 
     const completeHandler = () => {
@@ -197,7 +199,7 @@ export function FileList({
                 <CopyUrl onClick={() => onMakeUrl(file.id)}></CopyUrl>
                 <DeleteFile fileId={file.id} onDeleteSuccess={handleFileDelete}></DeleteFile>
               </div>
-              <RemoteFileItem contentType={file.contentType} id={file.id} name={file.name}></RemoteFileItem>
+              <RemoteFileItem id={file.id} name={file.name}></RemoteFileItem>
             </div>
           );
         })}

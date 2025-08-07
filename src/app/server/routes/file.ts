@@ -70,6 +70,14 @@ export const filesRoutes = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // 验证文件类型是否为图片
+      if (!input.contentType.startsWith("image/")) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "只支持上传图片文件",
+        });
+      }
+
       const date = new Date();
 
       const isoString = date.toISOString();
@@ -113,6 +121,14 @@ export const filesRoutes = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // 验证文件类型是否为图片
+      if (!input.contentType.startsWith("image/")) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "只支持上传图片文件",
+        });
+      }
+
       const date = new Date();
 
       const isoString = date.toISOString();
