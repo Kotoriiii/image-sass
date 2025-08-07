@@ -54,7 +54,14 @@ export function UrlMaker({ id }: { id: string }) {
       </div>
       <div>
         <div className="flex justify-center items-center p-2">
-          <Image src={url} alt="generate url" className=" max-w-full max-h-[60vh]"></Image>
+          <Image
+            src={url}
+            alt="generate url"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="w-auto h-auto max-w-full max-h-[60vh]"
+          ></Image>
         </div>
       </div>
       <div className="flex justify-between items-center gap-2">

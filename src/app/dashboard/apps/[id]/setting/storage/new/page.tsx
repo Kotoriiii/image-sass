@@ -31,7 +31,7 @@ export default function CreateNewStorageAPI() {
     <div className="container pt-10">
       <h1 className="text-3xl mb-6 max-w-md mx-auto">Create Storage</h1>
       <form className="flex flex-col gap-4 max-w-md mx-auto" onSubmit={handleSubmit(onSubmit)}>
-        <div>
+        <div className="flex flex-col gap-2">
           <Label>Name</Label>
           <Input
             {...register("name", {
@@ -41,7 +41,7 @@ export default function CreateNewStorageAPI() {
           <span className="text-red-500">{errors.name?.message}</span>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-2">
           <Label>Bucket</Label>
           <Input
             {...register("bucket", {
@@ -51,7 +51,7 @@ export default function CreateNewStorageAPI() {
           <span className="text-red-500">{errors.bucket?.message}</span>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-2">
           <Label>AccessKeyId</Label>
           <Input
             {...register("accessKeyId", {
@@ -61,7 +61,7 @@ export default function CreateNewStorageAPI() {
           <span className="text-red-500">{errors.accessKeyId?.message}</span>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-2">
           <Label>SecretAccessKey</Label>
           <Input
             type="password"
@@ -72,7 +72,7 @@ export default function CreateNewStorageAPI() {
           <span className="text-red-500">{errors.secretAccessKey?.message}</span>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-2">
           <Label>Region</Label>
           <Input
             {...register("region", {
@@ -82,7 +82,7 @@ export default function CreateNewStorageAPI() {
           <span className="text-red-500">{errors.region?.message}</span>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-2">
           <Label>ApiEndpoint</Label>
           <Input {...register("apiEndpoint")}></Input>
           <span className="text-red-500">{errors.apiEndpoint?.message}</span>
