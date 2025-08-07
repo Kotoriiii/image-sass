@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import Uppy from "@uppy/core";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/Dialog";
@@ -14,9 +14,11 @@ import { LocalFileItem } from "./FileItem";
 export function UploadPreview({ uppy }: { uppy: Uppy }) {
   const files = useUppyState(uppy, (s) => Object.values(s.files));
   const totalProgress = useUppyState(uppy, (s) => s.totalProgress);
+  const isUploading = useUppyState(uppy, (s) => s.totalProgress > 0 && s.totalProgress < 100);
   const open = files.length > 0;
 
   const [index, setIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   const file = files[index];
   const percentage = file?.progress?.percentage || 0;
@@ -64,9 +66,9 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
           >
             <ChevronLeft />
           </Button>
-          <div key={file.id} className="w-56 h-56 flex flex-col justify-center items-center gap-4">
+          <div key={file.id} className="w-56 h-56 flex flex-col justify-center items-center gap-2">
             <LocalFileItem file={file.data as File}></LocalFileItem>
-            {percentage > 0 && <Progress value={percentage}></Progress>}
+            {percentage > 0 && <Progress value={percentage} className="min-h-2"></Progress>}
           </div>
           <Button
             variant="ghost"
@@ -93,6 +95,23 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
           >
             Delete This
           </Button>
+          {isUploading && (
+            <Button
+              onClick={() => {
+                if (isPaused) {
+                  uppy.resumeAll();
+                  setIsPaused(false);
+                } else {
+                  uppy.pauseAll();
+                  setIsPaused(true);
+                }
+              }}
+              variant="outline"
+            >
+              {isPaused ? <Play className="w-4 h-4 mr-2" /> : <Pause className="w-4 h-4 mr-2" />}
+              {isPaused ? "Resume" : "Pause"}
+            </Button>
+          )}
           <Button
             onClick={() => {
               uppy
@@ -104,6 +123,7 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
                   clearFileList();
                 });
             }}
+            disabled={isUploading}
           >
             Upload All
           </Button>
