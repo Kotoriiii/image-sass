@@ -1,7 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
 import { useFormStatus } from "react-dom";
+
+import { Button } from "@/components/ui/Button";
 
 export function SubmitButton() {
   const status = useFormStatus();

@@ -19,5 +19,5 @@ export const filesCanOrderByColumns = fileSchema.pick({
 });
 
 export const createAppSchema = createInsertSchema(apps, {
-  name: schema => schema.min(3),
+  name: (schema) => schema.min(3),
 });

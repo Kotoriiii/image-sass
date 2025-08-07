@@ -1,23 +1,24 @@
-import z from "zod";
-import { Session } from "next-auth";
-import { v4 as uuid } from "uuid";
-import { asc, desc, eq, isNull, sql, and } from "drizzle-orm";
 import {
-  CreateMultipartUploadCommand,
-  UploadPartCommand,
-  CompleteMultipartUploadCommand,
-  ListPartsCommand,
   AbortMultipartUploadCommand,
-  PutObjectCommandInput,
+  CompleteMultipartUploadCommand,
+  CreateMultipartUploadCommand,
+  ListPartsCommand,
   PutObjectCommand,
+  PutObjectCommandInput,
+  UploadPartCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure, router } from "../trpc";
-import { files } from "../db/schema";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { Session } from "next-auth";
+import { v4 as uuid } from "uuid";
+import z from "zod";
+
 import { db } from "../db/db";
+import { files } from "../db/schema";
 import { filesCanOrderByColumns } from "../db/validate-schema";
 import S3ClientSingleton from "../S3ClientSingleton";
+import { protectedProcedure, router } from "../trpc";
 
 const getStorage = async (
   appId: string,
@@ -317,20 +318,14 @@ export const filesRoutes = router({
       return photo[0];
     }),
 
-  listFiles: protectedProcedure
-    .input(z.object({ appId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const result = await db.query.files.findMany({
-        orderBy: [desc(files.createdAt)],
-        where: (files, { eq }) =>
-          and(
-            eq(files.userId, ctx.session.user.id),
-            eq(files.appId, input.appId)
-          ),
-      });
+  listFiles: protectedProcedure.input(z.object({ appId: z.string() })).query(async ({ ctx, input }) => {
+    const result = await db.query.files.findMany({
+      orderBy: [desc(files.createdAt)],
+      where: (files, { eq }) => and(eq(files.userId, ctx.session.user.id), eq(files.appId, input.appId)),
+    });
 
-      return result;
-    }),
+    return result;
+  }),
 
   infinityQueryFiles: protectedProcedure
     .input(
@@ -347,11 +342,7 @@ export const filesRoutes = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const {
-        cursor,
-        limit,
-        orderBy = { field: "createdAt", order: "desc" },
-      } = input;
+      const { cursor, limit, orderBy = { field: "createdAt", order: "desc" } } = input;
 
       const deletedFilter = isNull(files.deletedAt);
       const userFilter = eq(files.userId, ctx.session.user.id);
@@ -378,11 +369,7 @@ export const filesRoutes = router({
             : and(deletedFilter, userFilter, appFilter)
         );
 
-      statement.orderBy(
-        orderBy.order === "desc"
-          ? desc(files[orderBy.field])
-          : asc(files[orderBy.field])
-      );
+      statement.orderBy(orderBy.order === "desc" ? desc(files[orderBy.field]) : asc(files[orderBy.field]));
 
       const result = await statement;
 

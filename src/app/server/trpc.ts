@@ -1,8 +1,9 @@
 import { headers } from "next/headers";
-import { TRPCError, initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
+import jwt, { JwtPayload } from "jsonwebtoken";
+
 import { getServerSession } from "@/server/auth";
 import { db } from "./db/db";
-import jwt, { JwtPayload } from "jsonwebtoken";
 
 const t = initTRPC.context().create();
 
@@ -26,21 +27,19 @@ export const withSessionMiddleware = t.middleware(async ({ next }) => {
   });
 });
 
-export const protectedProcedure = withLoggerProcedure
-  .use(withSessionMiddleware)
-  .use(async ({ ctx, next }) => {
-    if (!ctx.session?.user) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-      });
-    }
-
-    return next({
-      ctx: {
-        session: ctx.session!,
-      },
+export const protectedProcedure = withLoggerProcedure.use(withSessionMiddleware).use(async ({ ctx, next }) => {
+  if (!ctx.session?.user) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
     });
+  }
+
+  return next({
+    ctx: {
+      session: ctx.session!,
+    },
   });
+});
 
 export const withAppProcedure = withLoggerProcedure.use(async ({ next }) => {
   const header = await headers();
@@ -50,8 +49,7 @@ export const withAppProcedure = withLoggerProcedure.use(async ({ next }) => {
 
   if (apiKey) {
     const apiKeyAndAppUser = await db.query.apiKeys.findFirst({
-      where: (apiKeys, { eq, and, isNull }) =>
-        and(eq(apiKeys.key, apiKey), isNull(apiKeys.deletedAt)),
+      where: (apiKeys, { eq, and, isNull }) => and(eq(apiKeys.key, apiKey), isNull(apiKeys.deletedAt)),
       with: {
         app: {
           with: {
@@ -86,10 +84,7 @@ export const withAppProcedure = withLoggerProcedure.use(async ({ next }) => {
 
     const apiKeyAndAppUser = await db.query.apiKeys.findFirst({
       where: (apiKeys, { eq, and, isNull }) =>
-        and(
-          eq(apiKeys.clientId, (payload as JwtPayload).clientId),
-          isNull(apiKeys.deletedAt)
-        ),
+        and(eq(apiKeys.clientId, (payload as JwtPayload).clientId), isNull(apiKeys.deletedAt)),
       with: {
         app: {
           with: {

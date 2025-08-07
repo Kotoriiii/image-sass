@@ -1,23 +1,19 @@
 "use client";
 
-import Uppy from "@uppy/core";
 import { useState } from "react";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import Uppy from "@uppy/core";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTitle,
-} from "@/components/ui/Dialog";
+
 import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/Dialog";
 import { Progress } from "@/components/ui/Progress";
 import { useUppyState } from "@/dashboard/useUppyState";
 import { LocalFileItem } from "./FileItem";
-import { DialogDescription } from "@radix-ui/react-dialog";
 
 export function UploadPreview({ uppy }: { uppy: Uppy }) {
-  const files = useUppyState(uppy, s => Object.values(s.files));
-  const totalProgress = useUppyState(uppy, s => s.totalProgress);
+  const files = useUppyState(uppy, (s) => Object.values(s.files));
+  const totalProgress = useUppyState(uppy, (s) => s.totalProgress);
   const open = files.length > 0;
 
   const [index, setIndex] = useState(0);
@@ -26,7 +22,7 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
   const percentage = file?.progress?.percentage || 0;
 
   const clearFileList = () => {
-    files.map(file => {
+    files.map((file) => {
       uppy.removeFile(file.id);
     });
     setIndex(0);
@@ -42,14 +38,14 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
   return file ? (
     <Dialog
       open={open}
-      onOpenChange={flag => {
+      onOpenChange={(flag) => {
         if (flag === false) {
           clear();
         }
       }}
     >
       <DialogContent
-        onPointerDownOutside={e => {
+        onPointerDownOutside={(e) => {
           e.preventDefault();
         }}
       >
@@ -68,10 +64,7 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
           >
             <ChevronLeft />
           </Button>
-          <div
-            key={file.id}
-            className="w-56 h-56 flex flex-col justify-center items-center gap-4"
-          >
+          <div key={file.id} className="w-56 h-56 flex flex-col justify-center items-center gap-4">
             <LocalFileItem file={file.data as File}></LocalFileItem>
             {percentage > 0 && <Progress value={percentage}></Progress>}
           </div>

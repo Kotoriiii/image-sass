@@ -1,16 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  timestamp,
-  pgTable,
-  text,
-  primaryKey,
-  integer,
-  uuid,
-  varchar,
-  index,
-  serial,
-  json,
-} from "drizzle-orm/pg-core";
+import { index, integer, json, pgTable, primaryKey, serial, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable("user", {
   id: text("id")
@@ -46,7 +35,7 @@ export const accounts = pgTable(
     id_token: text("id_token"),
     session_state: text("session_state"),
   },
-  account => ({
+  (account) => ({
     compoundKey: primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
@@ -68,7 +57,7 @@ export const verificationTokens = pgTable(
     token: text("token").notNull(),
     expires: timestamp("expires", { mode: "date" }).notNull(),
   },
-  verificationToken => ({
+  (verificationToken) => ({
     compositePk: primaryKey({
       columns: [verificationToken.identifier, verificationToken.token],
     }),
@@ -89,7 +78,7 @@ export const files = pgTable(
     contentType: varchar("content_type", { length: 100 }).notNull(),
     appId: uuid("app_id").notNull(),
   },
-  table => ({
+  (table) => ({
     cursorIdx: index("cursor_idx").on(table.id, table.createdAt),
   })
 );
@@ -133,22 +122,17 @@ export const storageConfiguration = pgTable("storageConfiguration", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   userId: uuid("user_id").notNull(),
-  configuration: json("configuration")
-    .$type<S3StorageConfiguration>()
-    .notNull(),
+  configuration: json("configuration").$type<S3StorageConfiguration>().notNull(),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
   deletedAt: timestamp("deleted_at", { mode: "date" }),
 });
 
-export const storageConfigurationRelation = relations(
-  storageConfiguration,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [storageConfiguration.userId],
-      references: [users.id],
-    }),
-  })
-);
+export const storageConfigurationRelation = relations(storageConfiguration, ({ one }) => ({
+  user: one(users, {
+    fields: [storageConfiguration.userId],
+    references: [users.id],
+  }),
+}));
 
 export const apiKeys = pgTable("apiKeys", {
   id: serial("id").primaryKey(),

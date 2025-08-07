@@ -1,12 +1,13 @@
 "use client";
 
+import { useParams, useRouter } from "next/navigation";
+import { SubmitHandler, useForm } from "react-hook-form";
+
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { type S3StorageConfiguration } from "@/server/db/schema";
 import { trpcClientReact } from "@/utils/api";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useRouter, useParams } from "next/navigation";
 
 export default function CreateNewStorageAPI() {
   const router = useRouter();
@@ -21,9 +22,7 @@ export default function CreateNewStorageAPI() {
 
   const { mutate } = trpcClientReact.storages.createStorage.useMutation();
 
-  const onSubmit: SubmitHandler<
-    S3StorageConfiguration & { name: string }
-  > = data => {
+  const onSubmit: SubmitHandler<S3StorageConfiguration & { name: string }> = (data) => {
     mutate(data);
     router.push(`/dashboard/apps/${id}/setting/storage`);
   };
@@ -31,10 +30,7 @@ export default function CreateNewStorageAPI() {
   return (
     <div className="container pt-10">
       <h1 className="text-3xl mb-6 max-w-md mx-auto">Create Storage</h1>
-      <form
-        className="flex flex-col gap-4 max-w-md mx-auto"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <form className="flex flex-col gap-4 max-w-md mx-auto" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <Label>Name</Label>
           <Input
@@ -73,9 +69,7 @@ export default function CreateNewStorageAPI() {
               required: "secretAccessKey is required",
             })}
           ></Input>
-          <span className="text-red-500">
-            {errors.secretAccessKey?.message}
-          </span>
+          <span className="text-red-500">{errors.secretAccessKey?.message}</span>
         </div>
 
         <div>

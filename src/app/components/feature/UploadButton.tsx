@@ -1,7 +1,8 @@
+import { useRef } from "react";
 import Uppy from "@uppy/core";
 import { Plus } from "lucide-react";
+
 import { Button } from "../ui/Button";
-import { useRef } from "react";
 
 export function UploadButton({ uppy }: { uppy: Uppy }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -20,9 +21,9 @@ export function UploadButton({ uppy }: { uppy: Uppy }) {
       <input
         ref={inputRef}
         type="file"
-        onChange={e => {
+        onChange={(e) => {
           if (e.target.files) {
-            Array.from(e.target.files).forEach(file => {
+            Array.from(e.target.files).forEach((file) => {
               uppy.addFile({ name: file.name, data: file });
             });
           }

@@ -1,17 +1,13 @@
 import { useEffect } from "react";
 
-export function usePasteFile({
-  onFilesPaste,
-}: {
-  onFilesPaste: (files: File[]) => void;
-}) {
+export function usePasteFile({ onFilesPaste }: { onFilesPaste: (files: File[]) => void }) {
   useEffect(() => {
     const pasteHandler = (e: ClipboardEvent) => {
       const files: File[] = [];
       if (!e.clipboardData) {
         return;
       }
-      Array.from(e.clipboardData.items).forEach(item => {
+      Array.from(e.clipboardData.items).forEach((item) => {
         const f = item.getAsFile();
         if (f) {
           files.push(f);

@@ -1,11 +1,12 @@
-import z from "zod";
+import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { v4 as uuid } from "uuid";
-import { TRPCError } from "@trpc/server";
-import { createAppSchema } from "../db/validate-schema";
-import { protectedProcedure, router } from "../trpc";
+import z from "zod";
+
 import { db } from "../db/db";
 import { apps, storageConfiguration } from "../db/schema";
+import { createAppSchema } from "../db/validate-schema";
+import { protectedProcedure, router } from "../trpc";
 
 export const appsRouter = router({
   createApp: protectedProcedure
@@ -26,8 +27,7 @@ export const appsRouter = router({
 
   listApps: protectedProcedure.query(async ({ ctx }) => {
     const result = await db.query.apps.findMany({
-      where: (apps, { eq, and, isNull }) =>
-        and(eq(apps.userId, ctx.session.user.id), isNull(apps.deletedAt)),
+      where: (apps, { eq, and, isNull }) => and(eq(apps.userId, ctx.session.user.id), isNull(apps.deletedAt)),
       orderBy: [desc(apps.createdAt)],
     });
 
@@ -38,8 +38,7 @@ export const appsRouter = router({
     .input(z.object({ appId: z.string(), storageId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const storage = await db.query.storageConfiguration.findFirst({
-        where: (storages, { eq }) =>
-          eq(storageConfiguration.id, input.storageId),
+        where: (storages, { eq }) => eq(storageConfiguration.id, input.storageId),
       });
 
       if (storage?.userId !== ctx.session.user.id) {
@@ -53,8 +52,6 @@ export const appsRouter = router({
         .set({
           storageId: input.storageId,
         })
-        .where(
-          and(eq(apps.id, input.appId), eq(apps.userId, ctx.session.user.id))
-        );
+        .where(and(eq(apps.id, input.appId), eq(apps.userId, ctx.session.user.id)));
     }),
 });

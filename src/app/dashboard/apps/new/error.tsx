@@ -2,13 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 
-export default function CreateAppError({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+export default function CreateAppError({ error, reset }: { error: Error; reset: () => void }) {
   if (error.message.includes("App name already exists")) {
     return (
       <div>

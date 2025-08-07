@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { trpcClientReact } from "@/utils/api";
-import { Button } from "@/components/ui/Button";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/Button";
+import { trpcClientReact } from "@/utils/api";
 
 export default function DashboardAppList() {
   const getAppsResult = trpcClientReact.apps.listApps.useQuery(void 0, {
@@ -38,17 +39,12 @@ export default function DashboardAppList() {
             <Image src="/logo.svg" alt="Image SaaS" width={32} height={32} />
             <h1 className="text-xl font-semibold">App List</h1>
           </div>
-          {apps?.map(app => (
-            <div
-              key={app.id}
-              className=" flex w-full max-w-md flex-col gap-2 rounded-md border p-6"
-            >
+          {apps?.map((app) => (
+            <div key={app.id} className=" flex w-full max-w-md flex-col gap-2 rounded-md border p-6">
               <div className="flex items-center justify-between gap-6">
                 <div>
                   <h2 className="text-xl">{app.name}</h2>
-                  <p className="text-base-content/60">
-                    {app.description ? app.description : "(no description)"}
-                  </p>
+                  <p className="text-base-content/60">{app.description ? app.description : "(no description)"}</p>
                 </div>
                 <div>
                   <Button asChild>

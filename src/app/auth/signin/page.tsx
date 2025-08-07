@@ -1,21 +1,15 @@
 "use client";
 
-import { toast } from "sonner";
 import Link from "next/link";
 import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
-import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
+
 import { Button } from "@/components/ui/Button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/Form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/Form";
 import { Input } from "@/components/ui/Input";
 
 const formSchema = z.object({
@@ -70,12 +64,7 @@ export default function Signin() {
             )}
           />
           <Link href="/auth/register">
-            <Button
-              size="lg"
-              variant="link"
-              className="w-full mt-2"
-              type="button"
-            >
+            <Button size="lg" variant="link" className="w-full mt-2" type="button">
               Don&apos;t have account?
             </Button>
           </Link>
@@ -96,9 +85,7 @@ export default function Signin() {
           onClick={() =>
             signIn("gitlab", {
               callbackUrl:
-                process.env.NODE_ENV === "production"
-                  ? `${process.env.NEXT_PUBLIC_BASE_PATH}/dashboard`
-                  : "/dashboard",
+                process.env.NODE_ENV === "production" ? `${process.env.NEXT_PUBLIC_BASE_PATH}/dashboard` : "/dashboard",
             })
           }
         >
@@ -111,9 +98,7 @@ export default function Signin() {
           onClick={() =>
             signIn("github", {
               callbackUrl:
-                process.env.NODE_ENV === "production"
-                  ? `${process.env.NEXT_PUBLIC_BASE_PATH}/dashboard`
-                  : "/dashboard",
+                process.env.NODE_ENV === "production" ? `${process.env.NEXT_PUBLIC_BASE_PATH}/dashboard` : "/dashboard",
             })
           }
         >

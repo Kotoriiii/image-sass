@@ -1,48 +1,40 @@
 "use client";
 
+import { ReactNode, use, useState } from "react";
 import Image from "next/image";
-import { ReactNode, useState, use } from "react";
 import Link from "next/link";
-import { Uppy } from "@uppy/core";
-import awsS3 from "@uppy/aws-s3";
-import { MoveUp, MoveDown, Settings } from "lucide-react";
-import { trpcClientReact, trpcPureClient } from "@/utils/api";
-import { Button } from "@/components/ui/Button";
-import { UploadButton } from "@/components/feature/UploadButton";
-import { Dropzone } from "@/components/feature/Dropzone";
-import { usePasteFile } from "@/hooks/usePasteFile";
-import { UploadPreview } from "@/components/feature/UploadPreview";
-import { FileList } from "@/components/feature/FileList";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
-import { type FilesOrderByColumn } from "@/server/routes/file";
-import { UrlMaker } from "./UrlMaker";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import awsS3 from "@uppy/aws-s3";
+import { Uppy } from "@uppy/core";
+import { MoveDown, MoveUp, Settings } from "lucide-react";
 
-export default function AppPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+import { Dropzone } from "@/components/feature/Dropzone";
+import { FileList } from "@/components/feature/FileList";
+import { UploadButton } from "@/components/feature/UploadButton";
+import { UploadPreview } from "@/components/feature/UploadPreview";
+import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
+import { usePasteFile } from "@/hooks/usePasteFile";
+import { type FilesOrderByColumn } from "@/server/routes/file";
+import { trpcClientReact, trpcPureClient } from "@/utils/api";
+import { UrlMaker } from "./UrlMaker";
+
+export default function AppPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: appId } = use(params);
   const [makingUrlImageId, setMakingUrlImageId] = useState<string | null>(null);
 
-  const [orderBy, setOrderBy] = useState<
-    Exclude<FilesOrderByColumn, undefined>
-  >({
+  const [orderBy, setOrderBy] = useState<Exclude<FilesOrderByColumn, undefined>>({
     field: "createdAt",
     order: "desc",
   });
 
-  const { data: apps, isPending } = trpcClientReact.apps.listApps.useQuery(
-    void 0,
-    {
-      refetchOnReconnect: false,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    }
-  );
+  const { data: apps, isPending } = trpcClientReact.apps.listApps.useQuery(void 0, {
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
-  const currentApp = apps?.filter(app => app.id === appId)[0];
+  const currentApp = apps?.filter((app) => app.id === appId)[0];
 
   const [uppy] = useState(() => {
     const uppy = new Uppy();
@@ -74,7 +66,7 @@ export default function AppPage({
           key: key!,
           appId,
         });
-        return result.parts.map(part => ({
+        return result.parts.map((part) => ({
           PartNumber: part.PartNumber || 0,
           ETag: part.ETag || "", // 确保 ETag 是字符串
           Size: part.Size || 0,
@@ -97,14 +89,12 @@ export default function AppPage({
       },
       async completeMultipartUpload(file, { uploadId, key, parts }) {
         // 返回 MaybePromise<{ location: string }>
-        const result = await trpcPureClient.file.completeMultipartUpload.mutate(
-          {
-            uploadId,
-            key,
-            parts,
-            appId,
-          }
-        );
+        const result = await trpcPureClient.file.completeMultipartUpload.mutate({
+          uploadId,
+          key,
+          parts,
+          appId,
+        });
         if (!result.location) {
           throw new Error("Failed to complete multipart upload");
         }
@@ -141,8 +131,8 @@ export default function AppPage({
   });
 
   usePasteFile({
-    onFilesPaste: files => {
-      uppy.addFiles(files.map(file => ({ name: file.name, data: file })));
+    onFilesPaste: (files) => {
+      uppy.addFiles(files.map((file) => ({ name: file.name, data: file })));
     },
   });
 
@@ -161,7 +151,7 @@ export default function AppPage({
         <p className="text-lg">App Not Exist</p>
         <p className="text-sm">Choose another one</p>
         <div className="flex flex-col gap-4 items-center">
-          {apps?.map(app => (
+          {apps?.map((app) => (
             <Button key={app.id} asChild variant="link">
               <Link href={`/dashboard/apps/${app.id}`}>{app.name}</Link>
             </Button>
@@ -175,7 +165,7 @@ export default function AppPage({
         <div className="container flex justify-between items-center h-[60px]">
           <Button
             onClick={() => {
-              setOrderBy(current => ({
+              setOrderBy((current) => ({
                 ...current,
                 order: current?.order === "asc" ? "desc" : "asc",
               }));
@@ -197,27 +187,20 @@ export default function AppPage({
         </div>
 
         <Dropzone uppy={uppy} className=" relative h-[calc(100%-60px)]">
-          {draging => {
+          {(draging) => {
             return (
               <>
                 {draging && (
                   <div className=" absolute inset-0 bg-secondary/50 z-10 flex flex-col justify-center items-center gap-4">
-                    <Image
-                      src="/upload-icon.svg"
-                      alt="Upload"
-                      width={48}
-                      height={48}
-                    />
-                    <p className="text-2xl font-semibold text-black">
-                      Drag files here to upload
-                    </p>
+                    <Image src="/upload-icon.svg" alt="Upload" width={48} height={48} />
+                    <p className="text-2xl font-semibold text-black">Drag files here to upload</p>
                   </div>
                 )}
                 <FileList
                   appId={appId}
                   uppy={uppy}
                   orderBy={orderBy}
-                  onMakeUrl={id => setMakingUrlImageId(id)}
+                  onMakeUrl={(id) => setMakingUrlImageId(id)}
                 ></FileList>
               </>
             );
@@ -226,7 +209,7 @@ export default function AppPage({
         <UploadPreview uppy={uppy}></UploadPreview>
         <Dialog
           open={Boolean(makingUrlImageId)}
-          onOpenChange={flag => {
+          onOpenChange={(flag) => {
             if (flag === false) {
               setMakingUrlImageId(null);
             }

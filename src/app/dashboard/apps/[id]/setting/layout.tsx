@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
-import Link from "next/link";
 import { ReactNode } from "react";
-import { usePathname, useParams } from "next/navigation";
+import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
+
+import { Button } from "@/components/ui/Button";
 
 export default function SettingLayout({ children }: { children: ReactNode }) {
   const path = usePathname();
@@ -16,11 +17,7 @@ export default function SettingLayout({ children }: { children: ReactNode }) {
         <Button
           size="lg"
           asChild={path !== `/dashboard/apps/${id}/setting/storage`}
-          variant={
-            path === `/dashboard/apps/${id}/setting/storage`
-              ? "outline"
-              : "ghost"
-          }
+          variant={path === `/dashboard/apps/${id}/setting/storage` ? "outline" : "ghost"}
           disabled={path === `/dashboard/apps/${id}/setting/storage`}
         >
           {path !== `/dashboard/apps/${id}/setting/storage` ? (
@@ -32,11 +29,7 @@ export default function SettingLayout({ children }: { children: ReactNode }) {
         <Button
           size="lg"
           asChild={path !== `/dashboard/apps/${id}/setting/api-key`}
-          variant={
-            path === `/dashboard/apps/${id}/setting/api-key`
-              ? "outline"
-              : "ghost"
-          }
+          variant={path === `/dashboard/apps/${id}/setting/api-key` ? "outline" : "ghost"}
           disabled={path === `/dashboard/apps/${id}/setting/api-key`}
         >
           {path !== `/dashboard/apps/${id}/setting/api-key` ? (

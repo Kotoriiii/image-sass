@@ -1,13 +1,11 @@
-import { GetObjectCommand, GetObjectCommandInput } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
+import { GetObjectCommand, GetObjectCommandInput } from "@aws-sdk/client-s3";
 import sharp from "sharp";
+
 import { db } from "@/server/db/db";
 import S3ClientSingleton from "@/server/S3ClientSingleton";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const file = await db.query.files.findFirst({
     where: (files, { eq }) => eq(files.id, id),

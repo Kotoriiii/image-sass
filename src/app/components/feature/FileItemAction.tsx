@@ -1,22 +1,16 @@
 import { MouseEvent } from "react";
-import { trpcClientReact } from "@/utils/api";
-import { Button } from "../ui/Button";
-import { Trash2, Copy } from "lucide-react";
+import { Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-export function DeleteFile({
-  fileId,
-  onDeleteSuccess,
-}: {
-  fileId: string;
-  onDeleteSuccess: (fileId: string) => void;
-}) {
-  const { mutate: deleteFile, isPending } =
-    trpcClientReact.file.deleteFile.useMutation({
-      onSuccess() {
-        onDeleteSuccess(fileId);
-      },
-    });
+import { trpcClientReact } from "@/utils/api";
+import { Button } from "../ui/Button";
+
+export function DeleteFile({ fileId, onDeleteSuccess }: { fileId: string; onDeleteSuccess: (fileId: string) => void }) {
+  const { mutate: deleteFile, isPending } = trpcClientReact.file.deleteFile.useMutation({
+    onSuccess() {
+      onDeleteSuccess(fileId);
+    },
+  });
 
   const handleRemoveFile = () => {
     deleteFile(fileId);
@@ -30,11 +24,7 @@ export function DeleteFile({
   );
 }
 
-export function CopyUrl({
-  onClick,
-}: {
-  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
-}) {
+export function CopyUrl({ onClick }: { onClick: (e: MouseEvent<HTMLButtonElement>) => void }) {
   return (
     <Button variant="ghost" onClick={onClick}>
       <Copy />

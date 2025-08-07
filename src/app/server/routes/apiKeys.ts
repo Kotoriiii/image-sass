@@ -1,46 +1,41 @@
-import z from "zod";
-import { v4 as uuid } from "uuid";
 import { TRPCError } from "@trpc/server";
+import { v4 as uuid } from "uuid";
+import z from "zod";
+
 import { db } from "../db/db";
 import { apiKeys } from "../db/schema";
 import { protectedProcedure, router } from "../trpc";
 
 export const apiKeysRouter = router({
-  listApiKeys: protectedProcedure
-    .input(z.object({ appId: z.string() }))
-    .query(async ({ input }) => {
-      return db.query.apiKeys.findMany({
-        where: (apiKeys, { eq, and, isNull }) =>
-          and(eq(apiKeys.appId, input.appId), isNull(apiKeys.deletedAt)),
-        columns: {
-          key: false,
-        },
-      });
-    }),
+  listApiKeys: protectedProcedure.input(z.object({ appId: z.string() })).query(async ({ input }) => {
+    return db.query.apiKeys.findMany({
+      where: (apiKeys, { eq, and, isNull }) => and(eq(apiKeys.appId, input.appId), isNull(apiKeys.deletedAt)),
+      columns: {
+        key: false,
+      },
+    });
+  }),
 
-  requestKey: protectedProcedure
-    .input(z.number())
-    .query(async ({ input, ctx }) => {
-      const apiKey = await db.query.apiKeys.findFirst({
-        where: (apiKeys, { eq, isNull, and }) =>
-          and(eq(apiKeys.id, input), isNull(apiKeys.deletedAt)),
-        with: {
-          app: {
-            with: {
-              user: true,
-            },
+  requestKey: protectedProcedure.input(z.number()).query(async ({ input, ctx }) => {
+    const apiKey = await db.query.apiKeys.findFirst({
+      where: (apiKeys, { eq, isNull, and }) => and(eq(apiKeys.id, input), isNull(apiKeys.deletedAt)),
+      with: {
+        app: {
+          with: {
+            user: true,
           },
         },
+      },
+    });
+
+    if (apiKey?.app.user.id !== ctx.session.user.id) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
       });
+    }
 
-      if (apiKey?.app.user.id !== ctx.session.user.id) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-        });
-      }
-
-      return apiKey?.key;
-    }),
+    return apiKey?.key;
+  }),
 
   createApiKey: protectedProcedure
     .input(

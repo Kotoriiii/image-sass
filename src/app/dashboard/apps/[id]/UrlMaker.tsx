@@ -1,7 +1,8 @@
-import Image from "next/image";
 import { useState } from "react";
-import { toast } from "sonner";
+import Image from "next/image";
 import copy from "copy-to-clipboard";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Slider } from "@/components/ui/Slider";
@@ -12,9 +13,7 @@ export function UrlMaker({ id }: { id: string }) {
   const [rotate, setRotate] = useState(0);
 
   const [url, setUrl] = useState(
-    `${
-      process.env.NEXT_PUBLIC_BASE_PATH || ""
-    }/image/${id}?width=${width}&rotate=${rotate}`
+    `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/image/${id}?width=${width}&rotate=${rotate}`
   );
 
   return (
@@ -25,7 +24,7 @@ export function UrlMaker({ id }: { id: string }) {
           <Slider
             className="relative flex h-5 w-[200px] touch-none select-none items-center"
             value={[rotate]}
-            onValueChange={v => setRotate(v[0] ?? 0)}
+            onValueChange={(v) => setRotate(v[0] ?? 0)}
             max={180}
             min={-180}
             step={5}
@@ -42,16 +41,12 @@ export function UrlMaker({ id }: { id: string }) {
             max={2000}
             min={100}
             className="input input-bordered input-sm"
-            onChange={e => setWidth(Number(e.target.value))}
+            onChange={(e) => setWidth(Number(e.target.value))}
           />
         </div>
         <Button
           onClick={() =>
-            setUrl(
-              `${
-                process.env.NEXT_PUBLIC_BASE_PATH || ""
-              }/image/${id}?width=${width}&rotate=${rotate}`
-            )
+            setUrl(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/image/${id}?width=${width}&rotate=${rotate}`)
           }
         >
           Make
@@ -59,18 +54,11 @@ export function UrlMaker({ id }: { id: string }) {
       </div>
       <div>
         <div className="flex justify-center items-center p-2">
-          <Image
-            src={url}
-            alt="generate url"
-            className=" max-w-full max-h-[60vh]"
-          ></Image>
+          <Image src={url} alt="generate url" className=" max-w-full max-h-[60vh]"></Image>
         </div>
       </div>
       <div className="flex justify-between items-center gap-2">
-        <Input
-          value={`${process.env.NEXT_PUBLIC_SITE_URL}${url}`}
-          readOnly
-        ></Input>
+        <Input value={`${process.env.NEXT_PUBLIC_SITE_URL}${url}`} readOnly></Input>
         <Button
           onClick={() => {
             copy(`${process.env.NEXT_PUBLIC_SITE_URL}${url}`);

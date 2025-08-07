@@ -3,55 +3,43 @@
 import { use } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
 import { Button } from "@/components/ui/Button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/Accordion";
 import { trpcClientReact } from "@/utils/api";
 
-export default function StoragePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function StoragePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: storages } = trpcClientReact.storages.listStorages.useQuery();
 
   const { data: apps } = trpcClientReact.apps.listApps.useQuery();
 
-  const currentApp = apps?.filter(app => app.id === id)[0];
+  const currentApp = apps?.filter((app) => app.id === id)[0];
 
   const utils = trpcClientReact.useUtils();
 
-  const { mutate: changeStorage } =
-    trpcClientReact.apps.changeStorage.useMutation({
-      onSuccess: (data, { appId, storageId }) => {
-        utils.apps.listApps.setData(void 0, prev => {
-          if (!prev) {
-            return prev;
-          }
+  const { mutate: changeStorage } = trpcClientReact.apps.changeStorage.useMutation({
+    onSuccess: (data, { appId, storageId }) => {
+      utils.apps.listApps.setData(void 0, (prev) => {
+        if (!prev) {
+          return prev;
+        }
 
-          return prev.map(p =>
-            p.id === appId ? { ...p, storageId: storageId } : p
-          );
-        });
-      },
-    });
+        return prev.map((p) => (p.id === appId ? { ...p, storageId: storageId } : p));
+      });
+    },
+  });
 
-  const { mutate: deleteStorage } =
-    trpcClientReact.storages.deleteStorage.useMutation({
-      onSuccess: (data, { storageId }) => {
-        utils.storages.listStorages.setData(void 0, prev => {
-          if (!prev) {
-            return prev;
-          }
-          return prev.filter(p => p.id !== storageId);
-        });
-      },
-    });
+  const { mutate: deleteStorage } = trpcClientReact.storages.deleteStorage.useMutation({
+    onSuccess: (data, { storageId }) => {
+      utils.storages.listStorages.setData(void 0, (prev) => {
+        if (!prev) {
+          return prev;
+        }
+        return prev.filter((p) => p.id !== storageId);
+      });
+    },
+  });
 
   return (
     <div className="pt-10">
@@ -64,14 +52,10 @@ export default function StoragePage({
         </Button>
       </div>
       <Accordion type="single" collapsible>
-        {storages?.map(storage => {
+        {storages?.map((storage) => {
           return (
             <AccordionItem key={storage.id} value={String(storage.id)}>
-              <AccordionTrigger
-                className={
-                  storage.id === currentApp?.storageId ? "text-destructive" : ""
-                }
-              >
+              <AccordionTrigger className={storage.id === currentApp?.storageId ? "text-destructive" : ""}>
                 {storage.name}
               </AccordionTrigger>
               <AccordionContent>

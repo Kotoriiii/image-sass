@@ -1,8 +1,4 @@
-import {
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/Dialog";
+import { DialogContent, DialogDescription, DialogTitle } from "@/components/ui/Dialog";
 import CreateApp from "../../new/page";
 import BackAbleDialog from "./BackAbleDialog";
 

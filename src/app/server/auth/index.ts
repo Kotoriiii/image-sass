@@ -1,12 +1,9 @@
-import { db } from "@/server/db/db";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import {
-  AuthOptions,
-  DefaultSession,
-  getServerSession as nextAuthGetServerSession,
-} from "next-auth";
-import GitLabProvider from "next-auth/providers/gitlab";
+import { AuthOptions, DefaultSession, getServerSession as nextAuthGetServerSession } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+import GitLabProvider from "next-auth/providers/gitlab";
+
+import { db } from "@/server/db/db";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {

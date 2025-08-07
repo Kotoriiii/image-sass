@@ -1,14 +1,15 @@
-import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
-import Uppy, { UppyFile, Meta, Body } from "@uppy/core";
-import { useUppyState } from "@/dashboard/useUppyState";
-import { trpcClientReact, trpcPureClient, AppRouter } from "@/utils/api";
-import { LocalFileItem, RemoteFileItem } from "./FileItem";
 import { inferRouterOutputs } from "@trpc/server";
+import Uppy, { Body, Meta, UppyFile } from "@uppy/core";
+import { toast } from "sonner";
+
+import { useUppyState } from "@/dashboard/useUppyState";
 import { cn } from "@/lib/utils";
+import { type FilesOrderByColumn } from "@/server/routes/file";
+import { AppRouter, trpcClientReact, trpcPureClient } from "@/utils/api";
 import { Button } from "../ui/Button";
 import { ScrollArea } from "../ui/ScrollArea";
-import { type FilesOrderByColumn } from "@/server/routes/file";
+import { LocalFileItem, RemoteFileItem } from "./FileItem";
 import { CopyUrl, DeleteFile } from "./FileItemAction";
 
 type FileResult = inferRouterOutputs<AppRouter>["file"]["listFiles"];
@@ -40,7 +41,7 @@ export function FileList({
   } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(
     { ...queryKey },
     {
-      getNextPageParam: resp => resp.nextCursor,
+      getNextPageParam: (resp) => resp.nextCursor,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
@@ -56,13 +57,10 @@ export function FileList({
   const utils = trpcClientReact.useUtils();
 
   const [uploadingFileIDs, setUploadingFileIDs] = useState<string[]>([]);
-  const uppyFiles = useUppyState(uppy, s => s.files);
+  const uppyFiles = useUppyState(uppy, (s) => s.files);
 
   useEffect(() => {
-    const handler = (
-      file: UppyFile<Meta, Body> | undefined,
-      resp: NonNullable<UppyFile<Meta, Body>["response"]>
-    ) => {
+    const handler = (file: UppyFile<Meta, Body> | undefined, resp: NonNullable<UppyFile<Meta, Body>["response"]>) => {
       if (file) {
         trpcPureClient.file.saveFile
           .mutate({
@@ -71,39 +69,30 @@ export function FileList({
             type: file.data.type,
             appId,
           })
-          .then(resp => {
-            utils.file.infinityQueryFiles.setInfiniteData(
-              { ...queryKey },
-              prev => {
-                if (!prev) {
-                  return prev;
-                }
-                return {
-                  ...prev,
-                  pages: prev.pages.map((page, index) => {
-                    if (index === 0) {
-                      return {
-                        ...page,
-                        items: [resp, ...page.items],
-                      };
-                    }
-                    return page;
-                  }),
-                };
+          .then((resp) => {
+            utils.file.infinityQueryFiles.setInfiniteData({ ...queryKey }, (prev) => {
+              if (!prev) {
+                return prev;
               }
-            );
+              return {
+                ...prev,
+                pages: prev.pages.map((page, index) => {
+                  if (index === 0) {
+                    return {
+                      ...page,
+                      items: [resp, ...page.items],
+                    };
+                  }
+                  return page;
+                }),
+              };
+            });
           });
       }
     };
 
-    const uploadProgressHandler = (
-      uploadID: string,
-      files: UppyFile<Meta, Body>[]
-    ) => {
-      setUploadingFileIDs(currentFiles => [
-        ...currentFiles,
-        ...files.map(f => f.id),
-      ]);
+    const uploadProgressHandler = (uploadID: string, files: UppyFile<Meta, Body>[]) => {
+      setUploadingFileIDs((currentFiles) => [...currentFiles, ...files.map((f) => f.id)]);
     };
 
     const cancelProgressHandler = () => {
@@ -145,7 +134,7 @@ export function FileList({
   useEffect(() => {
     if (bottomRef.current) {
       const observer = new IntersectionObserver(
-        e => {
+        (e) => {
           if (e[0].intersectionRatio > 0.1) {
             fetchNextPage();
           }
@@ -167,18 +156,18 @@ export function FileList({
   }, [fetchNextPage]);
 
   const handleFileDelete = (id: string) => {
-    utils.file.infinityQueryFiles.setInfiniteData({ ...queryKey }, prev => {
+    utils.file.infinityQueryFiles.setInfiniteData({ ...queryKey }, (prev) => {
       if (!prev) {
         return prev;
       }
       return {
         ...prev,
-        pages: prev.pages.map(page => {
-          const hasId = page.items.some(item => item.id === id);
+        pages: prev.pages.map((page) => {
+          const hasId = page.items.some((item) => item.id === id);
           if (hasId) {
             return {
               ...page,
-              items: page.items.filter(item => item.id !== id),
+              items: page.items.filter((item) => item.id !== id),
             };
           }
           return page;
@@ -192,47 +181,28 @@ export function FileList({
       {isPending && <div className="text-center">Loading</div>}
       <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 gap-4 relative container">
         {uploadingFileIDs.length > 0 &&
-          uploadingFileIDs.map(id => {
+          uploadingFileIDs.map((id) => {
             const file = uppyFiles[id];
             return (
-              <div
-                key={file.id}
-                className="h-56 flex justify-center items-center border border-red-500"
-              >
+              <div key={file.id} className="h-56 flex justify-center items-center border border-red-500">
                 <LocalFileItem file={file.data as File}></LocalFileItem>
               </div>
             );
           })}
 
-        {fileList?.map(file => {
+        {fileList?.map((file) => {
           return (
-            <div
-              key={file.id}
-              className="h-56 flex relative justify-center items-center border"
-            >
+            <div key={file.id} className="h-56 flex relative justify-center items-center border">
               <div className="inset-0 absolute bg-background/30 opacity-0 hover:opacity-100 transition-all justify-center items-center flex">
                 <CopyUrl onClick={() => onMakeUrl(file.id)}></CopyUrl>
-                <DeleteFile
-                  fileId={file.id}
-                  onDeleteSuccess={handleFileDelete}
-                ></DeleteFile>
+                <DeleteFile fileId={file.id} onDeleteSuccess={handleFileDelete}></DeleteFile>
               </div>
-              <RemoteFileItem
-                contentType={file.contentType}
-                id={file.id}
-                name={file.name}
-              ></RemoteFileItem>
+              <RemoteFileItem contentType={file.contentType} id={file.id} name={file.name}></RemoteFileItem>
             </div>
           );
         })}
       </div>
-      <div
-        className={cn(
-          "justify-center p-8 hidden",
-          fileList.length > 0 && "flex"
-        )}
-        ref={bottomRef}
-      >
+      <div className={cn("justify-center p-8 hidden", fileList.length > 0 && "flex")} ref={bottomRef}>
         <Button variant="ghost" onClick={() => fetchNextPage()}>
           Load Next Page
         </Button>

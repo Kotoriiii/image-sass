@@ -1,19 +1,15 @@
 "use client";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu";
-import { trpcClientReact } from "@/utils/api";
 import Link from "next/link";
 import { Home } from "lucide-react";
+
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/DropdownMenu";
+import { trpcClientReact } from "@/utils/api";
 
 export function BreadCrumb({ id, leaf }: { id: string; leaf: string }) {
   const { data: apps, isPending } = trpcClientReact.apps.listApps.useQuery();
 
-  const currentApp = apps?.filter(app => app.id === id)[0];
+  const currentApp = apps?.filter((app) => app.id === id)[0];
 
   return (
     <nav className="flex" aria-label="Breadcrumb">
@@ -28,17 +24,11 @@ export function BreadCrumb({ id, leaf }: { id: string; leaf: string }) {
         </li>
         <li className="inline-flex items-center">
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              {isPending ? "Loading..." : currentApp ? currentApp.name : "..."}
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger>{isPending ? "Loading..." : currentApp ? currentApp.name : "..."}</DropdownMenuTrigger>
             <DropdownMenuContent>
-              {apps?.map(app => {
+              {apps?.map((app) => {
                 return (
-                  <DropdownMenuItem
-                    key={app.id}
-                    disabled={app.id === id}
-                    asChild
-                  >
+                  <DropdownMenuItem key={app.id} disabled={app.id === id} asChild>
                     <Link href={`/dashboard/apps/${app.id}`}>{app.name}</Link>
                   </DropdownMenuItem>
                 );
@@ -64,9 +54,7 @@ export function BreadCrumb({ id, leaf }: { id: string; leaf: string }) {
                 d="m1 9 4-4-4-4"
               />
             </svg>
-            <span className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">
-              {leaf}
-            </span>
+            <span className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">{leaf}</span>
           </div>
         </li>
       </ol>

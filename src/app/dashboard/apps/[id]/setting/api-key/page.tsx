@@ -1,22 +1,14 @@
 "use client";
 
-import { useState, use } from "react";
+import { use, useState } from "react";
 import copy from "copy-to-clipboard";
 import { Copy, Eye, Plus } from "lucide-react";
 import { toast } from "sonner";
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/Popover";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/Accordion";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
 import { trpcClientReact } from "@/utils/api";
 
 function KeyString({ id }: { id: number }) {
@@ -39,11 +31,7 @@ function KeyString({ id }: { id: number }) {
   );
 }
 
-export default function ApiKeysPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function ApiKeysPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [newApiKeyName, setNewApiKeyName] = useState("");
 
@@ -56,8 +44,8 @@ export default function ApiKeysPage({
   const [showKeyMap, setShowKeyMap] = useState<Record<number, boolean>>({});
 
   const { mutate } = trpcClientReact.apiKeys.createApiKey.useMutation({
-    onSuccess: data => {
-      utils.apiKeys.listApiKeys.setData({ appId: id }, prev => {
+    onSuccess: (data) => {
+      utils.apiKeys.listApiKeys.setData({ appId: id }, (prev) => {
         setNewApiKeyName("");
         if (!prev || !data) {
           return prev;
@@ -79,10 +67,7 @@ export default function ApiKeysPage({
           </PopoverTrigger>
           <PopoverContent>
             <div className="flex flex-col gap-4">
-              <Input
-                placeholder="Name"
-                onChange={e => setNewApiKeyName(e.target.value)}
-              ></Input>
+              <Input placeholder="Name" onChange={(e) => setNewApiKeyName(e.target.value)}></Input>
               <Button
                 type="submit"
                 onClick={() => {
@@ -96,7 +81,7 @@ export default function ApiKeysPage({
         </Popover>
       </div>
       <Accordion collapsible type="single">
-        {apiKeys?.map(apiKey => {
+        {apiKeys?.map((apiKey) => {
           return (
             <AccordionItem key={apiKey.id} value={String(apiKey.id)}>
               <AccordionTrigger>{apiKey.name}</AccordionTrigger>
@@ -122,7 +107,7 @@ export default function ApiKeysPage({
                   {!showKeyMap[apiKey.id] && (
                     <Button
                       onClick={() => {
-                        setShowKeyMap(oldMap => ({
+                        setShowKeyMap((oldMap) => ({
                           ...oldMap,
                           [apiKey.id]: true,
                         }));
@@ -132,9 +117,7 @@ export default function ApiKeysPage({
                     </Button>
                   )}
 
-                  {showKeyMap[apiKey.id] && (
-                    <KeyString id={apiKey.id}></KeyString>
-                  )}
+                  {showKeyMap[apiKey.id] && <KeyString id={apiKey.id}></KeyString>}
                 </div>
               </AccordionContent>
             </AccordionItem>

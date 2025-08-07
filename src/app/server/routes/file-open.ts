@@ -1,17 +1,14 @@
-import z from "zod";
-import { v4 as uuid } from "uuid";
-import { asc, desc, eq, isNull, sql, and } from "drizzle-orm";
-import {
-  S3Client,
-  PutObjectCommand,
-  PutObjectCommandInput,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, PutObjectCommandInput, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { TRPCError } from "@trpc/server";
-import { router, withAppProcedure } from "../trpc";
-import { files } from "../db/schema";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { v4 as uuid } from "uuid";
+import z from "zod";
+
 import { db } from "../db/db";
+import { files } from "../db/schema";
 import { filesCanOrderByColumns } from "../db/validate-schema";
+import { router, withAppProcedure } from "../trpc";
 
 const filesOrderByColumnSchema = z
   .object({
@@ -110,17 +107,14 @@ export const fileOpenRoutes = router({
       return photo[0];
     }),
 
-  listFiles: withAppProcedure
-    .input(z.object({ appId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const result = await db.query.files.findMany({
-        orderBy: [desc(files.createdAt)],
-        where: (files, { eq }) =>
-          and(eq(files.userId, ctx.user.id), eq(files.appId, input.appId)),
-      });
+  listFiles: withAppProcedure.input(z.object({ appId: z.string() })).query(async ({ ctx, input }) => {
+    const result = await db.query.files.findMany({
+      orderBy: [desc(files.createdAt)],
+      where: (files, { eq }) => and(eq(files.userId, ctx.user.id), eq(files.appId, input.appId)),
+    });
 
-      return result;
-    }),
+    return result;
+  }),
 
   infinityQueryFiles: withAppProcedure
     .input(
@@ -137,11 +131,7 @@ export const fileOpenRoutes = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const {
-        cursor,
-        limit,
-        orderBy = { field: "createdAt", order: "desc" },
-      } = input;
+      const { cursor, limit, orderBy = { field: "createdAt", order: "desc" } } = input;
 
       const deletedFilter = isNull(files.deletedAt);
       const userFilter = eq(files.userId, ctx.user.id);
@@ -154,9 +144,7 @@ export const fileOpenRoutes = router({
         .where(
           cursor
             ? and(
-                sql`("files"."created_at", "files"."id") < (${new Date(
-                  cursor.createdAt
-                ).toISOString()}, ${cursor.id})`,
+                sql`("files"."created_at", "files"."id") < (${new Date(cursor.createdAt).toISOString()}, ${cursor.id})`,
                 deletedFilter,
                 userFilter,
                 appFilter
@@ -164,11 +152,7 @@ export const fileOpenRoutes = router({
             : and(userFilter, deletedFilter, appFilter)
         );
 
-      statement.orderBy(
-        orderBy.order === "desc"
-          ? desc(files[orderBy.field])
-          : asc(files[orderBy.field])
-      );
+      statement.orderBy(orderBy.order === "desc" ? desc(files[orderBy.field]) : asc(files[orderBy.field]));
 
       const result = await statement;
 

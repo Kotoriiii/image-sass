@@ -1,6 +1,7 @@
-import { openRouter } from "@/server/open-router";
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { NextRequest } from "next/server";
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+
+import { openRouter } from "@/server/open-router";
 
 const handler = async (request: NextRequest) => {
   const res = await fetchRequestHandler({
