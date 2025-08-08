@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { AppListSkeleton } from "@/components/feature/Skeletons";
 import { Button } from "@/components/ui/Button";
+import { getAssetPath } from "@/lib/utils";
 import { getServerSession } from "@/server/auth";
 import { serverCaller } from "@/utils/trpc";
 
@@ -29,7 +30,7 @@ async function AppListContent() {
     <div className="flex justify-center items-center mx-auto pt-10">
       <div className="flex justify-center items-center w-full max-w-md flex-col gap-2 rounded-md border p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Image src="/logo.svg" alt="Image SaaS" width={32} height={32} />
+          <Image src={getAssetPath("/logo.svg")} alt="Image SaaS" width={32} height={32} />
           <h1 className="text-xl font-semibold">App List</h1>
         </div>
         {apps.map((app) => (

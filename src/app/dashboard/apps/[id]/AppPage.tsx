@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
 import { usePasteFile } from "@/hooks/usePasteFile";
 import { useUppy } from "@/hooks/useUppy";
+import { getAssetPath } from "@/lib/utils";
 import { type FilesOrderByColumn } from "@/server/routes/file";
 import { AppRouter } from "@/utils/api";
 import { UrlMaker } from "./UrlMaker";
@@ -104,7 +105,7 @@ export function AppPage({ appId, currentApp, apps, initialFileData }: AppPageCli
             <>
               {draging && (
                 <div className="absolute inset-0 bg-secondary/50 z-10 flex flex-col justify-center items-center gap-4">
-                  <Image src="/upload-icon.svg" alt="Upload" width={48} height={48} />
+                  <Image src={getAssetPath("/upload-icon.svg")} alt="Upload" width={48} height={48} />
                   <p className="text-2xl font-semibold text-black">Drag files here to upload</p>
                 </div>
               )}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { getAssetPath } from "@/lib/utils";
 import { Toaster } from "./components/ui/Sonner";
 import { TRPCProvider } from "./TrpcProvider";
 
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
   title: "Image SaaS - Smart Image Processing Platform",
   description: "Modern image processing SaaS platform providing upload, storage, processing and API services",
   icons: {
-    icon: "/icon.svg",
-    apple: "/logo.svg",
+    icon: getAssetPath("/icon.svg"),
+    apple: getAssetPath("/logo.svg"),
   },
 };
 

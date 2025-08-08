@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { Skeleton } from "@/components/ui/Skeleton";
+import { getAssetPath } from "@/lib/utils";
 
 // Dashboard App List Skeleton
 export function AppListSkeleton() {
@@ -62,7 +63,7 @@ export function AppPageSkeleton() {
 export function AppDashboardNavSkeleton() {
   return (
     <div className="flex items-center gap-3">
-      <Image src="/brand-logo.svg" alt="Image SaaS" width={32} height={32} />
+      <Image src={getAssetPath("/brand-logo.svg")} alt="Image SaaS" width={32} height={32} />
       <Skeleton className="w-24 h-9" />
     </div>
   );
