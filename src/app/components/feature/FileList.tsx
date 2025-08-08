@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { inferRouterOutputs } from "@trpc/server";
 import Uppy, { Body, Meta, UppyFile } from "@uppy/core";
@@ -14,17 +16,15 @@ import { CopyUrl, DeleteFile } from "./FileItemAction";
 
 type FileResult = inferRouterOutputs<AppRouter>["file"]["listFiles"];
 
-export function FileList({
-  uppy,
-  orderBy,
-  appId,
-  onMakeUrl,
-}: {
+interface FileListProps {
   uppy: Uppy;
   orderBy: FilesOrderByColumn;
   appId: string;
   onMakeUrl: (id: string) => void;
-}) {
+  initialData?: FileResult;
+}
+
+export function FileList({ uppy, orderBy, appId, onMakeUrl, initialData }: FileListProps) {
   const queryKey = useMemo(
     () => ({
       limit: 5,
@@ -45,6 +45,17 @@ export function FileList({
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
+      initialData: initialData
+        ? {
+            pages: [
+              {
+                items: initialData,
+                nextCursor: null,
+              },
+            ],
+            pageParams: [undefined],
+          }
+        : undefined,
     }
   );
 

@@ -4,15 +4,17 @@ import { use } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
+import { StorageSkeleton } from "@/components/feature/Skeletons";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
 import { Button } from "@/components/ui/Button";
 import { trpcClientReact } from "@/utils/api";
 
 export default function StoragePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { data: storages } = trpcClientReact.storages.listStorages.useQuery();
 
-  const { data: apps } = trpcClientReact.apps.listApps.useQuery();
+  const { data: storages, isPending: storagesPending } = trpcClientReact.storages.listStorages.useQuery();
+
+  const { data: apps, isPending: appsPending } = trpcClientReact.apps.listApps.useQuery();
 
   const currentApp = apps?.filter((app) => app.id === id)[0];
 
@@ -40,6 +42,10 @@ export default function StoragePage({ params }: { params: Promise<{ id: string }
       });
     },
   });
+
+  if (storagesPending || appsPending) {
+    return <StorageSkeleton />;
+  }
 
   return (
     <div className="pt-10">

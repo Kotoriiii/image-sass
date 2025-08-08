@@ -1,61 +1,61 @@
-"use client";
-
-import { useEffect } from "react";
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { redirect } from "next/navigation";
 
+import { AppListSkeleton } from "@/components/feature/Skeletons";
 import { Button } from "@/components/ui/Button";
-import { trpcClientReact } from "@/utils/api";
+import { getServerSession } from "@/server/auth";
+import { serverCaller } from "@/utils/trpc";
 
-export default function DashboardAppList() {
-  const getAppsResult = trpcClientReact.apps.listApps.useQuery(void 0, {
-    gcTime: Infinity,
-    staleTime: Infinity,
-  });
+async function AppListContent() {
+  // 服务端获取session
+  const session = await getServerSession();
 
-  const router = useRouter();
+  if (!session?.user) {
+    redirect("/auth/signin");
+  }
 
-  const { data: apps, isLoading } = getAppsResult;
+  // 服务端预取数据
+  const caller = serverCaller({ session });
+  const apps = await caller.apps.listApps();
 
-  useEffect(() => {
-    if (apps && apps.length === 0) {
-      toast("Create Your First App");
-      router.push("/dashboard/apps/new");
-    }
-  }, [apps, router]);
+  // 如果没有应用，直接重定向
+  if (apps.length === 0) {
+    redirect("/dashboard/apps/new");
+  }
 
   return (
     <div className="flex justify-center items-center mx-auto pt-10">
-      {isLoading ? (
-        <div className="flex flex-col items-center gap-4">
-          <Image src="/loading-icon.svg" alt="Loading" width={40} height={40} />
-          <p className="text-gray-600">Loading...</p>
+      <div className="flex justify-center items-center w-full max-w-md flex-col gap-2 rounded-md border p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Image src="/logo.svg" alt="Image SaaS" width={32} height={32} />
+          <h1 className="text-xl font-semibold">App List</h1>
         </div>
-      ) : (
-        <div className=" flex justify-center items-center w-full max-w-md flex-col gap-2 rounded-md border p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Image src="/logo.svg" alt="Image SaaS" width={32} height={32} />
-            <h1 className="text-xl font-semibold">App List</h1>
-          </div>
-          {apps?.map((app) => (
-            <div key={app.id} className=" flex w-full max-w-md flex-col gap-2 rounded-md border p-6">
-              <div className="flex items-center justify-between gap-6">
-                <div>
-                  <h2 className="text-xl">{app.name}</h2>
-                  <p className="text-base-content/60">{app.description ? app.description : "(no description)"}</p>
-                </div>
-                <div>
-                  <Button asChild>
-                    <Link href={`/dashboard/apps/${app.id}`}>Go</Link>
-                  </Button>
-                </div>
+        {apps.map((app) => (
+          <div key={app.id} className="flex w-full max-w-md flex-col gap-2 rounded-md border p-6">
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <h2 className="text-xl">{app.name}</h2>
+                <p className="text-base-content/60">{app.description ? app.description : "(no description)"}</p>
+              </div>
+              <div>
+                <Button asChild>
+                  <Link href={`/dashboard/apps/${app.id}`}>Go</Link>
+                </Button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<AppListSkeleton />}>
+      <AppListContent />
+    </Suspense>
   );
 }

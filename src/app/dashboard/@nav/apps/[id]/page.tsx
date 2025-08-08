@@ -4,6 +4,7 @@ import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { AppDashboardNavSkeleton } from "@/components/feature/Skeletons";
 import { Button } from "@/components/ui/Button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/DropdownMenu";
 import { trpcClientReact } from "@/utils/api";
@@ -14,12 +15,16 @@ export default function AppDashboardNav({ params }: { params: Promise<{ id: stri
 
   const currentApp = apps?.filter((app) => app.id === id)[0];
 
+  if (isPending) {
+    return <AppDashboardNavSkeleton />;
+  }
+
   return (
     <div className="flex items-center gap-3">
       <Image src="/brand-logo.svg" alt="Image SaaS" width={32} height={32} />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost">{isPending ? "Loading..." : currentApp ? currentApp.name : "..."}</Button>
+          <Button variant="ghost">{currentApp ? currentApp.name : "..."}</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           {apps?.map((app) => {

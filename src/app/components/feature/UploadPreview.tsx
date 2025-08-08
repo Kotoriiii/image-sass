@@ -1,15 +1,14 @@
-"use client";
-
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import Uppy from "@uppy/core";
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/Dialog";
 import { Progress } from "@/components/ui/Progress";
 import { useUppyState } from "@/hooks/useUppyState";
 import { LocalFileItem } from "./FileItem";
+import { CancelUploadButton, PauseResumeButton, UploadAllButton } from "./FileItemAction";
 
 export function UploadPreview({ uppy }: { uppy: Uppy }) {
   const files = useUppyState(uppy, (s) => Object.values(s.files));
@@ -84,49 +83,26 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
           </Button>
         </div>
         <DialogFooter>
-          <Button
-            onClick={() => {
-              uppy.removeFile(file.id);
-              if (index === files.length - 1) {
-                setIndex(files.length - 2);
-              }
-            }}
-            variant="destructive"
-          >
-            Delete This
-          </Button>
-          {isUploading && (
+          {!isUploading && (
             <Button
               onClick={() => {
-                if (isPaused) {
-                  uppy.resumeAll();
-                  setIsPaused(false);
-                } else {
-                  uppy.pauseAll();
-                  setIsPaused(true);
+                uppy.removeFile(file.id);
+                if (index === files.length - 1) {
+                  setIndex(files.length - 2);
                 }
               }}
-              variant="outline"
+              variant="destructive"
             >
-              {isPaused ? <Play className="w-4 h-4 mr-2" /> : <Pause className="w-4 h-4 mr-2" />}
-              {isPaused ? "Resume" : "Pause"}
+              Delete This
             </Button>
           )}
-          <Button
-            onClick={() => {
-              uppy
-                .upload()
-                .then(() => {
-                  clearFileList();
-                })
-                .catch(() => {
-                  clearFileList();
-                });
-            }}
-            disabled={isUploading}
-          >
-            Upload All
-          </Button>
+          {isUploading && (
+            <>
+              <CancelUploadButton uppy={uppy} onCancel={clearFileList} />
+              <PauseResumeButton uppy={uppy} isPaused={isPaused} onPauseChange={setIsPaused} />
+            </>
+          )}
+          <UploadAllButton uppy={uppy} isUploading={isUploading} onUploadComplete={clearFileList} />
         </DialogFooter>
       </DialogContent>
     </Dialog>

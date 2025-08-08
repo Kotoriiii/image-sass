@@ -1,20 +1,8 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { ThemeProvider as NextThemeProvider } from "next-themes";
 
 type Props = Parameters<typeof NextThemeProvider>[0];
 
 export function ThemeProvider(props: Props) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return null;
-  }
   return (
     <NextThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange {...props}>
       {props.children}

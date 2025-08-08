@@ -5,6 +5,7 @@ import copy from "copy-to-clipboard";
 import { Copy, Eye, Plus } from "lucide-react";
 import { toast } from "sonner";
 
+import { ApiKeysSkeleton, KeyStringSkeleton } from "@/components/feature/Skeletons";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -12,7 +13,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover
 import { trpcClientReact } from "@/utils/api";
 
 function KeyString({ id }: { id: number }) {
-  const { data: key } = trpcClientReact.apiKeys.requestKey.useQuery(id);
+  const { data: key, isPending } = trpcClientReact.apiKeys.requestKey.useQuery(id);
+
+  if (isPending) {
+    return <KeyStringSkeleton />;
+  }
 
   return (
     <div className="flex justify-end items-center gap-2">
@@ -34,14 +39,13 @@ function KeyString({ id }: { id: number }) {
 export default function ApiKeysPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [newApiKeyName, setNewApiKeyName] = useState("");
+  const [showKeyMap, setShowKeyMap] = useState<Record<number, boolean>>({});
 
-  const { data: apiKeys } = trpcClientReact.apiKeys.listApiKeys.useQuery({
+  const { data: apiKeys, isPending } = trpcClientReact.apiKeys.listApiKeys.useQuery({
     appId: id,
   });
 
   const utils = trpcClientReact.useUtils();
-
-  const [showKeyMap, setShowKeyMap] = useState<Record<number, boolean>>({});
 
   const { mutate } = trpcClientReact.apiKeys.createApiKey.useMutation({
     onSuccess: (data) => {
@@ -54,6 +58,10 @@ export default function ApiKeysPage({ params }: { params: Promise<{ id: string }
       });
     },
   });
+
+  if (isPending) {
+    return <ApiKeysSkeleton />;
+  }
 
   return (
     <div className="pt-10">
