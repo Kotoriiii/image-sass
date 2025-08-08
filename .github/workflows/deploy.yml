@@ -25,6 +25,7 @@ jobs:
           echo "GITLAB_SECRET=${{ secrets.GITLAB_SECRET }}" >> .env.production
           echo "GH_CLIENT_ID=${{ secrets.GH_CLIENT_ID }}" >> .env.production
           echo "GH_CLIENT_SECRET=${{ secrets.GH_CLIENT_SECRET }}" >> .env.production
+          cat .env.production
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
