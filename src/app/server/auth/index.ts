@@ -42,8 +42,8 @@ export const authOptions: AuthOptions = {
       allowDangerousEmailAccountLinking: true,
     }),
     GithubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
+      clientId: process.env.GH_CLIENT_ID!,
+      clientSecret: process.env.GH_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
     }),
   ],
