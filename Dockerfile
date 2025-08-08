@@ -1,83 +1,64 @@
-# 使用官方 Node.js 18 Alpine 镜像作为基础镜像
 FROM node:18-alpine AS base
 
-# 安装必要的系统依赖
+# Install dependencies only when needed
+FROM base AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# 安装 pnpm
-RUN npm install -g pnpm
+# Install dependencies based on the preferred package manager
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+RUN \
+    if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+    elif [ -f package-lock.json ]; then npm ci; \
+    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+    else echo "Lockfile not found." && exit 1; \
+    fi
 
-# 复制 package.json 和 pnpm-lock.yaml
-COPY package.json pnpm-lock.yaml* ./
 
-# ===============================
-# Dependencies 阶段 - 安装所有依赖
-# ===============================
-FROM base AS deps
-
-# 安装生产和开发依赖
-RUN pnpm install --frozen-lockfile
-
-# ===============================
-# Builder 阶段 - 构建应用
-# ===============================
+# Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
-
-# 从 deps 阶段复制 node_modules
 COPY --from=deps /app/node_modules ./node_modules
-
-# 复制源代码和配置文件
 COPY . .
 
-# 设置环境变量
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
+# Next.js collects completely anonymous telemetry data about general usage.
+# Learn more here: https://nextjs.org/telemetry
+# Uncomment the following line in case you want to disable telemetry during the build.
+# ENV NEXT_TELEMETRY_DISABLED=1
 
-# 构建应用
-RUN pnpm build
+RUN \
+    if [ -f yarn.lock ]; then yarn run build; \
+    elif [ -f package-lock.json ]; then npm run build; \
+    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+    else echo "Lockfile not found." && exit 1; \
+    fi
 
-# ===============================
-# Production 阶段 - 运行时镜像
-# ===============================
+# Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
-# 设置环境变量
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+# Uncomment the following line in case you want to disable telemetry during runtime.
+# ENV NEXT_TELEMETRY_DISABLED=1
 
-# 创建非 root 用户
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# 复制 public 文件夹
 COPY --from=builder /app/public ./public
 
-# 设置正确的权限并复制构建产物
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# 复制构建产物
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# 复制 package.json 用于生产依赖
-COPY --from=builder /app/package.json ./package.json
-
-# 安装生产依赖
-RUN pnpm install --prod --frozen-lockfile
-
-# 切换到非 root 用户
 USER nextjs
 
-# 暴露端口
 EXPOSE 3000
 
-# 设置环境变量
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
 
-# 启动应用
+# server.js is created by next build from the standalone output
+# https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
+ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
