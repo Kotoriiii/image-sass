@@ -26,10 +26,15 @@ export function useFileQuery({ orderBy, appId, initialData }: UseFileQueryProps)
     data: infinityQueryData,
     isPending,
     fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(
     { ...queryKey },
     {
-      getNextPageParam: (resp) => resp.nextCursor,
+      getNextPageParam: (resp) => {
+        // 只有当返回的数据量等于limit时，才认为还有下一页
+        return resp.items.length === queryKey.limit ? resp.nextCursor : undefined;
+      },
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
@@ -38,7 +43,13 @@ export function useFileQuery({ orderBy, appId, initialData }: UseFileQueryProps)
             pages: [
               {
                 items: initialData,
-                nextCursor: null,
+                nextCursor:
+                  initialData.length === queryKey.limit
+                    ? {
+                        createdAt: initialData[initialData.length - 1]?.createdAt || new Date().toISOString(),
+                        id: initialData[initialData.length - 1]?.id || "",
+                      }
+                    : null,
               },
             ],
             pageParams: [undefined],
@@ -59,6 +70,8 @@ export function useFileQuery({ orderBy, appId, initialData }: UseFileQueryProps)
     fileList,
     isPending,
     fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     queryKey,
     utils,
   };

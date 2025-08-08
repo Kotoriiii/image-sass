@@ -27,7 +27,7 @@ interface FileListProps {
 
 export function FileList({ uppy, orderBy, appId, onMakeUrl, initialData }: FileListProps) {
   // 使用文件查询 hook
-  const { fileList, isPending, fetchNextPage, queryKey, utils } = useFileQuery({
+  const { fileList, isPending, fetchNextPage, hasNextPage, isFetchingNextPage, queryKey, utils } = useFileQuery({
     orderBy,
     appId,
     initialData,
@@ -47,8 +47,8 @@ export function FileList({ uppy, orderBy, appId, onMakeUrl, initialData }: FileL
   // 使用无限滚动 hook
   const { lastElementRef } = useInfiniteScroll({
     fetchNextPage,
-    hasNextPage: true,
-    isFetchingNextPage: false,
+    hasNextPage,
+    isFetchingNextPage,
   });
 
   return (

@@ -1,14 +1,3 @@
-export default function AppLayout({
-  children,
-  intercepting,
-}: {
-  children: React.ReactNode;
-  intercepting: React.ReactNode;
-}) {
-  return (
-    <>
-      {children}
-      {intercepting}
-    </>
-  );
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }

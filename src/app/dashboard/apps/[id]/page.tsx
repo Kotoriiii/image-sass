@@ -23,7 +23,7 @@ async function AppPageContent({ params }: { params: Promise<{ id: string }> }) {
   // 预取文件列表数据
   const initialFileData = await caller.file.infinityQueryFiles({
     appId,
-    limit: 8,
+    limit: 5,
     cursor: undefined,
   });
 
