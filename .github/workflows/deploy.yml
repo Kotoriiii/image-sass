@@ -1,0 +1,63 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@main
+
+      - name: Create env production file
+        run: |
+          touch .env.production
+          echo "DB_URL=${{ secrets.DB_URL }}" >> .env.production
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env.production
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env.production
+          echo "NEXT_PUBLIC_TRPC_URL=${{ secrets.NEXT_PUBLIC_TRPC_URL }}" >> .env.production
+          echo "NEXT_PUBLIC_BASE_PATH=${{ secrets.NEXT_PUBLIC_BASE_PATH }}" >> .env.production
+          echo "NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}" >> .env.production
+          echo "GITLAB_ID=${{ secrets.GITLAB_ID }}" >> .env.production
+          echo "GITLAB_SECRET=${{ secrets.GITLAB_SECRET }}" >> .env.production
+          echo "GH_CLIENT_ID=${{ secrets.GH_CLIENT_ID }}" >> .env.production
+          echo "GH_CLIENT_SECRET=${{ secrets.GH_CLIENT_SECRET }}" >> .env.production
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to aliyun private docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ALIYUN_REGISTRY_URL }}
+          username: ${{ secrets.ALIYUN_ACCESS_USERID }}
+          password: ${{ secrets.ALIYUN_ACCESS_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{secrets.ALIYUN_REGISTRY_TAG}}
+
+      - name: Deploy to Aliyun
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.ALIYUN_HOST}}
+          username: ${{secrets.ALIYUN_USERNAME}}
+          password: ${{secrets.ALIYUN_PASSWORD}}
+          script: |
+            docker login --username=${{ secrets.ALIYUN_ACCESS_USERID }} --password=${{ secrets.ALIYUN_ACCESS_PASSWORD }} ${{ secrets.ALIYUN_REGISTRY_URL }}
+            sudo docker pull ${{ secrets.ALIYUN_REGISTRY_TAG }}
+            sudo docker container stop ${{secrets.ALIYUN_CONTAINER_NAME}}  || true
+            sudo docker container rm ${{secrets.ALIYUN_CONTAINER_NAME}}  || true
+            sudo docker image rm ${{secrets.ALIYUN_REGISTRY_TAG}} || true
+            sudo docker run -it -d --network image-sass --read-only --memory 256m --name ${{secrets.ALIYUN_CONTAINER_NAME}} -p ${{secrets.ALIYUN_CONTAINER_BIND_PORT}} ${{ secrets.ALIYUN_REGISTRY_TAG }}
