@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Uppy, { Body, Meta, UppyFile } from "@uppy/core";
 import { toast } from "sonner";
 
@@ -19,6 +19,7 @@ interface UseFileUploadProps {
 export function useFileUpload({ uppy, appId, queryKey, utils }: UseFileUploadProps) {
   const [uploadingFileIDs, setUploadingFileIDs] = useState<string[]>([]);
   const uppyFiles = useUppyState(uppy, (s) => s.files);
+  const isCancelled = useRef<boolean>(false);
 
   useEffect(() => {
     const handler = (file: UppyFile<Meta, Body> | undefined, resp: NonNullable<UppyFile<Meta, Body>["response"]>) => {
@@ -57,6 +58,7 @@ export function useFileUpload({ uppy, appId, queryKey, utils }: UseFileUploadPro
     };
 
     const cancelProgressHandler = () => {
+      isCancelled.current = true;
       setUploadingFileIDs([]);
       toast.error("cancel the upload");
     };
@@ -70,7 +72,10 @@ export function useFileUpload({ uppy, appId, queryKey, utils }: UseFileUploadPro
 
     const completeHandler = () => {
       setUploadingFileIDs([]);
-      toast.success("upload file success");
+      if (!isCancelled.current) {
+        toast.success("upload file success");
+      }
+      isCancelled.current = false; // 重置状态
     };
 
     uppy.on("upload", uploadProgressHandler);
