@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import { inferRouterOutputs } from "@trpc/server";
-import Uppy, { Body, Meta, UppyFile } from "@uppy/core";
-import { toast } from "sonner";
+import Uppy from "@uppy/core";
 
-import { useUppyState } from "@/hooks/useUppyState";
+import { useFileDelete } from "@/hooks/useFileDelete";
+import { useFileQuery } from "@/hooks/useFileQuery";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { cn } from "@/lib/utils";
 import { type FilesOrderByColumn } from "@/server/routes/file";
-import { AppRouter, trpcClientReact, trpcPureClient } from "@/utils/api";
+import { AppRouter } from "@/utils/api";
 import { Button } from "../ui/Button";
 import { ScrollArea } from "../ui/ScrollArea";
 import { LocalFileItem, RemoteFileItem } from "./FileItem";
@@ -25,169 +26,30 @@ interface FileListProps {
 }
 
 export function FileList({ uppy, orderBy, appId, onMakeUrl, initialData }: FileListProps) {
-  const queryKey = useMemo(
-    () => ({
-      limit: 5,
-      orderBy,
-      appId,
-    }),
-    [orderBy, appId]
-  );
+  // 使用文件查询 hook
+  const { fileList, isPending, fetchNextPage, queryKey, utils } = useFileQuery({
+    orderBy,
+    appId,
+    initialData,
+  });
 
-  const {
-    data: infinityQueryData,
-    isPending,
+  // 使用文件上传 hook
+  const { uploadingFileIDs, uppyFiles } = useFileUpload({
+    uppy,
+    appId,
+    queryKey,
+    utils,
+  });
+
+  // 使用文件删除 hook
+  const { handleFileDelete } = useFileDelete({ queryKey, utils });
+
+  // 使用无限滚动 hook
+  const { lastElementRef } = useInfiniteScroll({
     fetchNextPage,
-  } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(
-    { ...queryKey },
-    {
-      getNextPageParam: (resp) => resp.nextCursor,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      initialData: initialData
-        ? {
-            pages: [
-              {
-                items: initialData,
-                nextCursor: null,
-              },
-            ],
-            pageParams: [undefined],
-          }
-        : undefined,
-    }
-  );
-
-  const fileList = infinityQueryData
-    ? infinityQueryData.pages.reduce((result, page) => {
-        return [...result, ...page.items];
-      }, [] as FileResult)
-    : [];
-
-  const utils = trpcClientReact.useUtils();
-
-  const [uploadingFileIDs, setUploadingFileIDs] = useState<string[]>([]);
-  const uppyFiles = useUppyState(uppy, (s) => s.files);
-
-  useEffect(() => {
-    const handler = (file: UppyFile<Meta, Body> | undefined, resp: NonNullable<UppyFile<Meta, Body>["response"]>) => {
-      if (file) {
-        trpcPureClient.file.saveFile
-          .mutate({
-            name: file.data instanceof File ? file.data.name : "test",
-            path: resp.uploadURL ?? "",
-            type: file.data.type,
-            appId,
-          })
-          .then((resp) => {
-            utils.file.infinityQueryFiles.setInfiniteData({ ...queryKey }, (prev) => {
-              if (!prev) {
-                return prev;
-              }
-              return {
-                ...prev,
-                pages: prev.pages.map((page, index) => {
-                  if (index === 0) {
-                    return {
-                      ...page,
-                      items: [resp, ...page.items],
-                    };
-                  }
-                  return page;
-                }),
-              };
-            });
-          });
-      }
-    };
-
-    const uploadProgressHandler = (uploadID: string, files: UppyFile<Meta, Body>[]) => {
-      setUploadingFileIDs((currentFiles) => [...currentFiles, ...files.map((f) => f.id)]);
-    };
-
-    const cancelProgressHandler = () => {
-      setUploadingFileIDs([]);
-      toast.error("cancel the upload");
-    };
-
-    const errorHandler = (error: { name: string; message: string; details?: string }) => {
-      setUploadingFileIDs([]);
-      // 显示具体的错误信息，如果有的话
-      const errorMessage = error?.message || "cannot upload file";
-      toast.error(errorMessage);
-    };
-
-    const completeHandler = () => {
-      setUploadingFileIDs([]);
-      toast.success("upload file success");
-    };
-
-    uppy.on("upload", uploadProgressHandler);
-
-    uppy.on("cancel-all", cancelProgressHandler);
-
-    uppy.on("error", errorHandler);
-
-    uppy.on("upload-success", handler);
-
-    uppy.on("complete", completeHandler);
-
-    return () => {
-      uppy.off("upload-success", handler);
-      uppy.off("cancel-all", cancelProgressHandler);
-      uppy.off("error", errorHandler);
-      uppy.off("upload", uploadProgressHandler);
-      uppy.off("complete", completeHandler);
-    };
-  }, [appId, queryKey, uppy, utils]);
-
-  const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (bottomRef.current) {
-      const observer = new IntersectionObserver(
-        (e) => {
-          if (e[0].intersectionRatio > 0.1) {
-            fetchNextPage();
-          }
-        },
-        {
-          threshold: 0.1,
-        }
-      );
-
-      observer.observe(bottomRef.current);
-
-      const element = bottomRef.current;
-
-      return () => {
-        observer.unobserve(element);
-        observer.disconnect();
-      };
-    }
-  }, [fetchNextPage]);
-
-  const handleFileDelete = (id: string) => {
-    utils.file.infinityQueryFiles.setInfiniteData({ ...queryKey }, (prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return {
-        ...prev,
-        pages: prev.pages.map((page) => {
-          const hasId = page.items.some((item) => item.id === id);
-          if (hasId) {
-            return {
-              ...page,
-              items: page.items.filter((item) => item.id !== id),
-            };
-          }
-          return page;
-        }),
-      };
-    });
-  };
+    hasNextPage: true,
+    isFetchingNextPage: false,
+  });
 
   return (
     <ScrollArea className="h-full @container">
@@ -215,7 +77,7 @@ export function FileList({ uppy, orderBy, appId, onMakeUrl, initialData }: FileL
           );
         })}
       </div>
-      <div className={cn("justify-center p-8 hidden", fileList.length > 0 && "flex")} ref={bottomRef}>
+      <div className={cn("justify-center p-8 hidden", fileList.length > 0 && "flex")} ref={lastElementRef}>
         <Button variant="ghost" onClick={() => fetchNextPage()}>
           Load Next Page
         </Button>
