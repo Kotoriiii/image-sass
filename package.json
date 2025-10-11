@@ -12,7 +12,13 @@
     "format:check": "prettier --check .",
     "prepare": "husky",
     "push:dev": "NODE_ENV=development drizzle-kit push",
-    "push:prod": "NODE_ENV=production drizzle-kit push"
+    "push:prod": "NODE_ENV=production drizzle-kit push",
+    "commit": "git-cz"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
@@ -77,6 +83,8 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
+    "commitizen": "^4.3.1",
+    "cz-git": "^1.12.0",
     "dotenv": "^17.2.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
