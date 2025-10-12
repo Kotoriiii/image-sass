@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/Input";
 
 const formSchema = z.object({
   email: z.string().email({
-    message: "not vaild email",
+    message: "not valid email",
   }),
   password: z.string().min(1, {
     message: "cannot be empty",

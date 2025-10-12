@@ -8,7 +8,7 @@ export function Dropzone({
   ...divProps
 }: {
   uppy: Uppy;
-  children: ReactNode | ((draging: boolean) => ReactNode);
+  children: ReactNode | ((dragging: boolean) => ReactNode);
 } & Omit<HTMLAttributes<HTMLDivElement>, "children">) {
   const [dragging, setDragging] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

@@ -4,6 +4,9 @@
 # Run ESLint
 pnpm lint
 
+# Run cspell check
+pnpm spellcheck
+
 # Check formatting
 if ! pnpm format:check; then
   echo "🔧 Auto-formatting files..."

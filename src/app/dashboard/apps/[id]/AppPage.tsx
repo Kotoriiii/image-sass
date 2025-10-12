@@ -100,10 +100,10 @@ export function AppPage({ appId, currentApp, apps, initialFileData }: AppPageCli
       </div>
 
       <Dropzone uppy={uppy} className="relative h-[calc(100%-60px)]">
-        {(draging) => {
+        {(dragging) => {
           return (
             <>
-              {draging && (
+              {dragging && (
                 <div className="absolute inset-0 bg-secondary/50 z-10 flex flex-col justify-center items-center gap-4">
                   <Image src={getAssetPath("/upload-icon.svg")} alt="Upload" width={48} height={48} />
                   <p className="text-2xl font-semibold text-black">Drag files here to upload</p>
