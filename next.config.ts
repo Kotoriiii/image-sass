@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   },
   output: "standalone",
+  images:{
+    loader: "custom",
+    loaderFile: './src/app/lib/imageLoader.ts'
+  }
 };
 
 export default nextConfig;
