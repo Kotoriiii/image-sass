@@ -155,7 +155,3 @@ pnpm lint
 # 代码格式化
 pnpm format
 ```
-
-## 📝 许可证
-
-MIT License
